@@ -11,8 +11,8 @@ namespace DefaultWebShop.Services
     {
         Task<IEnumerable<Product>> GetProducts();
         Task<Product> GetProduct(int id);
-        Task<Product> CreateProduct(ProductViewModel product);
-        Task<Product> UpdateProduct(int id, ProductViewModel product);
-        Task<Product> DeleteProduct(ProductViewModel product);
+        Task<Product> CreateProduct(ProductViewModel model);
+        Task<Product> UpdateProduct(int id, ProductViewModel model);
+        Task<Product> DeleteProduct(int id);
     }
 }

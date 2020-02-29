@@ -1,4 +1,5 @@
 ﻿using DefaultWebShop.Models;
+using DefaultWebShop.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,8 +11,8 @@ namespace DefaultWebShop.Services
     {
         Task<IEnumerable<Product>> GetProducts();
         Task<Product> GetProduct(int id);
-        Task<Product> CreateProduct(Product product);
-        Task<Product> UpdateProduct(int id, Product product);
-        Task<Product> DeleteProduct(Product product);
+        Task<Product> CreateProduct(ProductViewModel product);
+        Task<Product> UpdateProduct(int id, ProductViewModel product);
+        Task<Product> DeleteProduct(ProductViewModel product);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using DefaultWebShop.Models;
+using DefaultWebShop.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,12 +14,12 @@ namespace DefaultWebShop.Services
         {
             _context = context;
         }
-        public Task<Product> CreateProduct(Product product)
+        public Task<Product> CreateProduct(ProductViewModel product)
         {
             throw new NotImplementedException();
         }
 
-        public Task<Product> DeleteProduct(Product product)
+        public Task<Product> DeleteProduct(ProductViewModel product)
         {
             throw new NotImplementedException();
         }
@@ -33,7 +34,7 @@ namespace DefaultWebShop.Services
             throw new NotImplementedException();
         }
 
-        public Task<Product> UpdateProduct(int id, Product product)
+        public Task<Product> UpdateProduct(int id, ProductViewModel product)
         {
             throw new NotImplementedException();
         }

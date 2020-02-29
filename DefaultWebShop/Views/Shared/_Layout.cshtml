@@ -25,19 +25,7 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
                     </ul>
-                    <div class="btn-group">
-                        <button type="button" class="btn btn-warning" asp-controller="Products" asp-action="Index">Products</button>
-                        <button type="button" class="btn btn-warning dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <span class="sr-only">Toggle Dropdown</span>
-                        </button>
-                        <div class="dropdown-menu">
-                            <a class="dropdown-item" href="#">Weapon</a>
-                            <a class="dropdown-item" href="#">Vehicle</a>
-                            <a class="dropdown-item" href="#">Book</a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="#">Other</a>
-                        </div>
-                    </div>
+                    <partial name="_NavPartial" />
                 </div>
             </div>
         </nav>

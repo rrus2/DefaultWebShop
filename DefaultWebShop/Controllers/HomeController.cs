@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using DefaultWebShop.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace DefaultWebShop.Controllers
 {
@@ -13,13 +14,15 @@ namespace DefaultWebShop.Controllers
     {
         private readonly ILogger<HomeController> _logger;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, ApplicationDbContext context)
         {
             _logger = logger;
         }
 
         public IActionResult Index()
         {
+            //admin name = admin@defaultwebshop.com
+            //admin password = Admin123!
             return View();
         }
 

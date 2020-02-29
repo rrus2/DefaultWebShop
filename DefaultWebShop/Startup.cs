@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DefaultWebShop.Migrations;
 using DefaultWebShop.Models;
 using DefaultWebShop.Services;
 using Microsoft.AspNetCore.Builder;

@@ -30,7 +30,15 @@ namespace DefaultWebShop.Controllers
         {
             var product = await _productService.GetProduct(id);
             var model = new ProductViewModel { ProductID=product.ProductID, Name = product.Name, Price = product.Price, Stock = product.Stock, ImagePath = product.ImagePath };
+            CalculateAmount(product.Stock);
             return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Details(int id, int amount)
+        {
+
+            return View();
         }
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create()
@@ -64,6 +72,16 @@ namespace DefaultWebShop.Controllers
         {
             var genres = await _genreService.GetGenres();
             ViewBag.Genres = new SelectList(genres, "GenreID", "Name");
+        }
+        private void CalculateAmount(int stock)
+        {
+            var list = new List<int>();
+            for (int i = 1; i < stock+1; i++)
+            {
+                list.Add(i);
+            }
+            var select = new SelectList(list);
+            ViewBag.Amount = select;
         }
     }
 }

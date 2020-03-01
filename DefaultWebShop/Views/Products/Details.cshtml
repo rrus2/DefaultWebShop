@@ -7,7 +7,7 @@
 <h1>Details</h1>
 <div class="container bg-dark text-center rounded">
     <div class="jumbotron bg-warning rounded-circle">
-        <form>
+        <form asp-controller="Products" asp-action="Details">
             <div class="form-group">
                 Name: 
                 @Model.Name
@@ -18,12 +18,13 @@
             </div>
             <div class="form-group">
                 Amount: 
+                <select name="amount" asp-items="@ViewBag.Amount"></select>
             </div>
             <div class="form-group">
                 Image: 
                 <img src="~/@Model.ImagePath" alt="No image" class="img-fluid border-dark" height="250" width="250" onclick="EnlargeImage()" />
             </div>
-            <a asp-controller="Products" asp-action="Buy" asp-route-id="@Model.ProductID" class="btn btn-primary">Buy product</a>
+            <input type="submit" value="Buy product" asp-route-id="@Model.ProductID" asp-route-amount="@Model.Amount" class="btn btn-primary">
             <a asp-controller="ShoppingCart" asp-action="AddToCart" asp-route-id="@Model.ProductID" class="btn btn-secondary">Add to shopping cart</a>
         </form>
     </div>

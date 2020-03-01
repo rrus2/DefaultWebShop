@@ -21,6 +21,7 @@ namespace DefaultWebShop.Areas.Identity.Pages.Account
     public class RegisterModel : PageModel
     {
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
@@ -28,11 +29,13 @@ namespace DefaultWebShop.Areas.Identity.Pages.Account
         public RegisterModel(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
+            RoleManager<IdentityRole> roleManager,
             ILogger<RegisterModel> logger,
             IEmailSender emailSender)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _roleManager = roleManager;
             _logger = logger;
             _emailSender = emailSender;
         }
@@ -79,7 +82,12 @@ namespace DefaultWebShop.Areas.Identity.Pages.Account
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)
                 {
-                    await _userManager.AddToRoleAsync(user, "User");
+                    if(!await _roleManager.RoleExistsAsync("Admin"))
+                        await _roleManager.CreateAsync(new IdentityRole { Name = "Admin" });
+                    if(!await _roleManager.RoleExistsAsync("User"))
+                        await _roleManager.CreateAsync(new IdentityRole { Name = "User" });
+
+                    await _userManager.AddToRoleAsync(user, "Admin");
                     _logger.LogInformation("User created a new account with password.");
 
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);

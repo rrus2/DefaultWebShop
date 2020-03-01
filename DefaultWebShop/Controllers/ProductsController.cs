@@ -31,14 +31,15 @@ namespace DefaultWebShop.Controllers
             var product = await _productService.GetProduct(id);
             return View(product);
         }
-
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create()
         {
             await LoadGenres();
             return View();
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpPost]
+        [AutoValidateAntiforgeryToken]
         public async Task<IActionResult> Create(ProductViewModel model, IFormCollection collection)
         {
             var file = collection.Files[0];

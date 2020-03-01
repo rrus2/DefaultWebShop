@@ -87,7 +87,7 @@ namespace DefaultWebShop.Areas.Identity.Pages.Account
                     if(!await _roleManager.RoleExistsAsync("User"))
                         await _roleManager.CreateAsync(new IdentityRole { Name = "User" });
 
-                    await _userManager.AddToRoleAsync(user, "Admin");
+                    await _userManager.AddToRoleAsync(user, "User");
                     _logger.LogInformation("User created a new account with password.");
 
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);

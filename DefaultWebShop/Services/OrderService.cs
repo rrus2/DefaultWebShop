@@ -22,7 +22,7 @@ namespace DefaultWebShop.Services
             var product = await _context.Products.FirstOrDefaultAsync(x => x.ProductID == productid);
             if (product == null)
                 throw new Exception("Product does not exist for this order");
-            var order = new Order { ApplicationUserID = userid, ProductID = productid, Amount = amount };
+            var order = new Order { ApplicationUserID = userid, ApplicationUser = user, ProductID = productid, Product = product, Amount = amount };
             try
             {
                 _context.Orders.Add(order);

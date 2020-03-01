@@ -9,33 +9,28 @@
 
 <h4>ProductViewModel</h4>
 <hr />
-<div class="row">
-    <div class="col-md-4">
+<div class="container bg-dark text-center rounded">
+    <div class="jumbotron bg-warning rounded-circle">
         <form asp-action="Create" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
+                <input asp-for="Name" class="form-control-sm" placeholder="Name" />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Price" class="control-label"></label>
-                <input asp-for="Price" class="form-control" />
+                <input asp-for="Price" class="form-control-sm" placeholder="Price" />
                 <span asp-validation-for="Price" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Stock" class="control-label"></label>
-                <input asp-for="Stock" class="form-control" />
+                <input asp-for="Stock" class="form-control-sm" placeholder="Stock" />
                 <span asp-validation-for="Stock" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="ImagePath" class="control-label"></label>
-                <input name="image" asp-for="ImagePath" type="file" class="form-control-file" />
+                <input name="image" asp-for="ImagePath" type="file" class="form-control-sm" placeholder="Image" />
                 <span asp-validation-for="ImagePath" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="GenreID" class="control-label"></label>
-                <select asp-for="GenreID" asp-items="@ViewBag.Genres" class="form-control"></select>
+                <select asp-for="GenreID" asp-items="@ViewBag.Genres" class="form-control-sm"></select>
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />

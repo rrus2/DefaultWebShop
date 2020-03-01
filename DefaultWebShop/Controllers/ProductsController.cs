@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using DefaultWebShop.Models;
 using DefaultWebShop.Services;
 using DefaultWebShop.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -15,10 +18,17 @@ namespace DefaultWebShop.Controllers
     {
         private readonly IProductService _productService;
         private readonly IGenreService _genreService;
-        public ProductsController(IProductService productService, IGenreService genreService)
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IOrderService _orderService;
+        public ProductsController(IProductService productService, 
+            IGenreService genreService, 
+            UserManager<ApplicationUser> userManager,
+            IOrderService orderService)
         {
             _productService = productService;
             _genreService = genreService;
+            _userManager = userManager;
+            _orderService = orderService;
         }
         public async Task<IActionResult> Index()
         {
@@ -35,11 +45,13 @@ namespace DefaultWebShop.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Details(int id, int amount)
+        public async Task<IActionResult> Details(int productid, int amount)
         {
-
+            var user = await GetUser(HttpContext.User);
+            await _orderService.CreateOrder(user.Id, productid, amount);
             return View();
         }
+
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create()
         {
@@ -82,6 +94,11 @@ namespace DefaultWebShop.Controllers
             }
             var select = new SelectList(list);
             ViewBag.Amount = select;
+        }
+        private async Task<ApplicationUser> GetUser(ClaimsPrincipal claim)
+        {
+            var user = await _userManager.GetUserAsync(claim);
+            return user;
         }
     }
 }

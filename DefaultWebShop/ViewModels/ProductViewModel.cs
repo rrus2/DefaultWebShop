@@ -17,11 +17,12 @@ namespace DefaultWebShop.ViewModels
         [Required(ErrorMessage = "Product stock is required")]
         [Range(1, int.MaxValue, ErrorMessage = "Stock cannot have negative value")]
         public int Stock { get; set; }
-        [Required(ErrorMessage = "Image is required")]
         [DataType(DataType.Upload)]
+        [Display(Name = "Image")]
         public string ImagePath { get; set; }
         [Required(ErrorMessage = "You must provide a genre")]
         [Range(1, int.MaxValue)]
+        [Display(Name = "Genre")]
         public int GenreID { get; set; }
     }
 }

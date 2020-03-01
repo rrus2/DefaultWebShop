@@ -35,7 +35,7 @@ namespace DefaultWebShop
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
 
             });
-            services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
+            services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders().AddDefaultUI();
             services.AddScoped<IProductService, ProductService>();
             services.AddScoped<IGenreService, GenreService>();
         }

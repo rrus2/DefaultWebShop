@@ -1,5 +1,6 @@
 ﻿using DefaultWebShop.Models;
 using DefaultWebShop.ViewModels;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,7 @@ namespace DefaultWebShop.Services
     {
         Task<IEnumerable<Product>> GetProducts();
         Task<Product> GetProduct(int id);
-        Task<Product> CreateProduct(ProductViewModel model);
+        Task<Product> CreateProduct(ProductViewModel model, IFormFile file);
         Task<Product> UpdateProduct(int id, ProductViewModel model);
         Task<Product> DeleteProduct(int id);
     }

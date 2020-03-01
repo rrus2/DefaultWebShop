@@ -1,8 +1,11 @@
 ﻿using DefaultWebShop.Models;
 using DefaultWebShop.ViewModels;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -11,15 +14,28 @@ namespace DefaultWebShop.Services
     public class ProductService : IProductService
     {
         private readonly ApplicationDbContext _context;
-        public ProductService(ApplicationDbContext context)
+        private readonly IWebHostEnvironment _env;
+        public ProductService(ApplicationDbContext context, IWebHostEnvironment env)
         {
             _context = context;
+            _env = env;
         }
-        public async Task<Product> CreateProduct(ProductViewModel model)
+        public async Task<Product> CreateProduct(ProductViewModel model, IFormFile file)
         {
             if (model == null)
                 throw new Exception("ProductViewModel cannot be null");
             var product = new Product { Name = model.Name, Price = model.Price, ImagePath = model.ImagePath, Stock = model.Stock, GenreID = model.GenreID };
+            if(file != null)
+            {
+                var uploads = Path.Combine(_env.WebRootPath, "images");
+                var fileName = Guid.NewGuid().ToString() + file.FileName;
+                using (var stream = new FileStream(Path.Combine(uploads, fileName), FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                    var imagePath = "images/" + fileName;
+                    product.ImagePath = imagePath;
+                }
+            }
             try
             {
                 await _context.AddAsync(product);

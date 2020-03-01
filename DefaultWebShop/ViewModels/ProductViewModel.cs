@@ -8,6 +8,7 @@ namespace DefaultWebShop.ViewModels
 {
     public class ProductViewModel
     {
+        public int ProductID { get; set; }
         [Required(ErrorMessage = "Product name is required")]
         public string Name { get; set; }
         [Required(ErrorMessage = "Product price is required")]
@@ -24,5 +25,6 @@ namespace DefaultWebShop.ViewModels
         [Range(1, int.MaxValue)]
         [Display(Name = "Genre")]
         public int GenreID { get; set; }
+        public int Amount { get; set; }
     }
 }

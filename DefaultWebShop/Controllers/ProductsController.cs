@@ -29,7 +29,8 @@ namespace DefaultWebShop.Controllers
         public async Task<IActionResult> Details(int id)
         {
             var product = await _productService.GetProduct(id);
-            return View(product);
+            var model = new ProductViewModel { ProductID=product.ProductID, Name = product.Name, Price = product.Price, Stock = product.Stock, ImagePath = product.ImagePath };
+            return View(model);
         }
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create()

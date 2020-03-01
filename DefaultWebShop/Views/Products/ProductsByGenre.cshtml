@@ -1,0 +1,27 @@
+﻿@model IEnumerable<DefaultWebShop.Models.Product>
+@{
+    ViewData["Title"] = "ProductsByGenre";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Products</h1>
+
+@if (User.IsInRole("Admin"))
+{
+    <p>
+        <a asp-action="Create">Create new product</a>
+    </p>
+}
+@foreach (var item in Model)
+{
+    <div class="jumbotron bg-warning text-center">
+        <h2>@item.Name</h2>
+        <p>@item.Price $</p>
+        <p><img src="~/@item.ImagePath" alt="No image" class="img-thumbnail" height="150" width="150" /></p>
+        <a class="btn btn-primary" asp-controller="Products" asp-action="Details" asp-route-id="@item.ProductID">View product</a>
+    </div>
+}
+<div class="text-center">
+    <a class="nav nav-link" asp-action="Index" asp-controller="Home">Home</a>
+</div>
+

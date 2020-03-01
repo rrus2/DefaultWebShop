@@ -51,6 +51,13 @@ namespace DefaultWebShop.Controllers
             await _productService.CreateProduct(model, file);
             return RedirectToAction(nameof(Index));
         }
+        public async Task<IActionResult> ProductsByGenre(int id)
+        {
+            var genre = await _genreService.GetGenre(id);
+            var products = await _productService.GetProducts();
+            var genreproducts = products.Where(x => x.GenreID == genre.GenreID);
+            return View(genreproducts);
+        }
         private async Task LoadGenres()
         {
             var genres = await _genreService.GetGenres();

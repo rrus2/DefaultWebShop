@@ -34,6 +34,10 @@
                     <partial name="_NavPartial" />
                 </div>
                 <partial name="_LoginPartial" />
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <a asp-controller="ShoppingCart" asp-action="Index"><img src="~/images/shoppingcart.jpg" height="50" width="50"/></a>
+                }
             </div>
         </nav>
     </header>

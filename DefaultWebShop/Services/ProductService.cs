@@ -66,6 +66,12 @@ namespace DefaultWebShop.Services
             return product;
         }
 
+        public async Task<int> GetCount()
+        {
+            var products = await _context.Products.ToListAsync();
+            return products.Count;
+        }
+
         public async Task<Product> GetProduct(int id)
         {
             if (id == 0 || id < 0)
@@ -76,10 +82,14 @@ namespace DefaultWebShop.Services
             return product;
         }
 
-        public async Task<IEnumerable<Product>> GetProducts()
+        public async Task<IEnumerable<Product>> GetProducts(int? pageNumber, int size)
         {
-            var products = await _context.Products.Include(x => x.Genre).ToListAsync();
-            return products;
+            var products = _context.Products.Include(x => x.Genre).AsEnumerable();
+            if (pageNumber != null && size != null)
+            {
+                products = products.OrderBy(x => x.Name).Skip(((int)pageNumber - 1) * (int)size).Take((int)size);
+            }
+            return products.ToList();
         }
 
         public async Task<Product> UpdateProduct(int id, ProductViewModel model)

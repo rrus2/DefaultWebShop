@@ -30,11 +30,16 @@ namespace DefaultWebShop.Controllers
             _userManager = userManager;
             _orderService = orderService;
         }
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? pageNumber = 1, int size = 3)
         {
-            var products = await _productService.GetProducts();
-
-            return View(products);
+            var products = await _productService.GetProducts(pageNumber, size);
+            var model = new ProductPageViewModel 
+            { 
+                Count = await _productService.GetCount(), 
+                Products = products, 
+                CurrentPage = (int)pageNumber 
+            };
+            return View(model);
         }
         public async Task<IActionResult> Details(int id)
         {
@@ -73,12 +78,18 @@ namespace DefaultWebShop.Controllers
             await _productService.CreateProduct(model, file);
             return RedirectToAction(nameof(Index));
         }
-        public async Task<IActionResult> ProductsByGenre(int id)
+        public async Task<IActionResult> ProductsByGenre(int id, int? pageNumber = 1, int size = 3)
         {
             var genre = await _genreService.GetGenre(id);
-            var products = await _productService.GetProducts();
+            var products = await _productService.GetProducts(pageNumber, size);
             var genreproducts = products.Where(x => x.GenreID == genre.GenreID);
-            return View(genreproducts);
+            var genreproductsviewmodel = new ProductPageViewModel 
+            { 
+                Count = await _productService.GetCount(), 
+                CurrentPage = (int)pageNumber, 
+                Products = genreproducts 
+            };
+            return View(genreproductsviewmodel);
         }
         private async Task LoadGenres()
         {

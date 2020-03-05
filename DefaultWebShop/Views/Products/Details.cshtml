@@ -27,10 +27,10 @@
             <div class="form-group">
                 Total: <p id="totalprice">@Model.Price $</p>
             </div>
-            @if (User.Identity.IsAuthenticated)
+            @if (User.Identity.IsAuthenticated && Model.Stock > 0)
             {
-                <input type="submit" value="Buy product" asp-route-productid="@Model.ProductID" asp-route-amount="@Model.Amount" class="btn btn-primary">
-                <a asp-controller="ShoppingCart" asp-action="AddToCart" asp-route-id="@Model.ProductID" class="btn btn-secondary">Add to shopping cart</a>
+                <input type="submit" value="Buy product" asp-route-productid="@Model.ProductID" asp-route-amount="@Model.Amount" class="btn btn-primary" />
+                <input type="submit" value="Add to shopping cart" asp-controller="ShoppingCart" asp-action="AddToCart" asp-route-id="@Model.ProductID" class="btn btn-secondary" />
             }
         </form>
     </div>

@@ -9,28 +9,28 @@
 
 <h4>ProductViewModel</h4>
 <hr />
-<div class="container bg-dark text-center rounded">
-    <div class="jumbotron bg-warning rounded-circle">
+<div class="container bg-dark text-center rounded jumbotron">
+    <div class="jumbotron bg-warning">
         <form asp-action="Create" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <input asp-for="Name" class="form-control-sm" placeholder="Name" />
+                <input asp-for="Name" class="form-control" placeholder="Name" />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input asp-for="Price" class="form-control-sm" placeholder="Price" />
+                <input asp-for="Price" class="form-control" placeholder="Price" />
                 <span asp-validation-for="Price" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input asp-for="Stock" class="form-control-sm" placeholder="Stock" />
+                <input asp-for="Stock" class="form-control" placeholder="Stock" />
                 <span asp-validation-for="Stock" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input name="image" asp-for="ImagePath" type="file" class="form-control-sm" placeholder="Image" />
+                <input name="image" asp-for="ImagePath" type="file" placeholder="Image" />
                 <span asp-validation-for="ImagePath" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <select asp-for="GenreID" asp-items="@ViewBag.Genres" class="form-control-sm"></select>
+                <select asp-for="GenreID" asp-items="@ViewBag.Genres" class="form-control"></select>
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />

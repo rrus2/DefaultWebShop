@@ -28,5 +28,16 @@ namespace DefaultWebShop.Controllers
             await _shoppingCartService.DeleteFromCart(id);
             return View(nameof(Index));
         }
+
+        public async Task<IActionResult> AddToCart(int id, int amount)
+        {
+            var model = await _shoppingCartService.AddToCart(id, User, amount);
+            return View(nameof(ThankYouShoppingCart), model);
+        }
+
+        public IActionResult ThankYouShoppingCart()
+        {
+            return View();
+        }
     }
 }

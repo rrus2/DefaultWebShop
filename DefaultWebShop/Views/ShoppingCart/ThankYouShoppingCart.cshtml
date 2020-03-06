@@ -1,0 +1,9 @@
+﻿@model DefaultWebShop.Models.ShoppingCart
+@{
+    ViewData["Title"] = "ThankYouShoppingCart";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>You added @Model.Amount of @Model.Product.Name to shopping cart</h1>
+
+<a asp-controller="Products" asp-action="Index">Back to products</a>

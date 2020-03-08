@@ -1,0 +1,25 @@
+﻿
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Admin page for @User.Identity.Name</h1>
+<div class="jumbotron bg-dark text-center rounded">
+    <div class="jumbotron bg-warning rounded-circle">
+        <div class="row">
+            <div class="col-sm-4">
+                <a class="btn btn-primary" asp-action="CreateUser">Create user</a><br />
+                <a class="btn btn-primary" asp-action="CreateProduct">Create product</a>
+            </div>
+            <div class="col-sm-4">
+                <a class="btn btn-primary" asp-action="EditUser">Edit user</a><br />
+                <a class="btn btn-primary" asp-action="EditProduct">Edit product</a>
+            </div>
+            <div class="col-sm-4">
+                <a class="btn btn-danger" asp-action="DeleteUser">Delete user</a><br />
+                <a class="btn btn-danger" asp-action="DeleteProduct">Delete product</a>
+            </div>
+        </div>
+    </div>
+</div>

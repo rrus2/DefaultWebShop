@@ -85,7 +85,7 @@ namespace DefaultWebShop.Services
         public async Task<IEnumerable<Product>> GetProducts(int? pageNumber, int size)
         {
             var products = _context.Products.Include(x => x.Genre).AsEnumerable();
-            if (pageNumber != null && size != null)
+            if (pageNumber != null)
             {
                 products = products.OrderBy(x => x.Name).Skip(((int)pageNumber - 1) * (int)size).Take((int)size);
             }

@@ -40,6 +40,7 @@ namespace DefaultWebShop
             services.AddScoped<IGenreService, GenreService>();
             services.AddScoped<IOrderService, OrderService>();
             services.AddScoped<IShoppingCartService, ShoppingCartService>();
+            services.AddScoped<IAdminService, AdminService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

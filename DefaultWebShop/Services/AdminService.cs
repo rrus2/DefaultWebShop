@@ -1,6 +1,7 @@
 ﻿using DefaultWebShop.Models;
 using DefaultWebShop.ViewModels;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,9 +12,11 @@ namespace DefaultWebShop.Services
     public class AdminService : IAdminService
     {
         private readonly UserManager<ApplicationUser> _userManager;
-        public AdminService(UserManager<ApplicationUser> userManager)
+        private readonly ApplicationDbContext _context;
+        public AdminService(UserManager<ApplicationUser> userManager, ApplicationDbContext context)
         {
             _userManager = userManager;
+            _context = context;
         }
         public async Task<ApplicationUser> CreateUser(UserViewModel model)
         {
@@ -30,6 +33,27 @@ namespace DefaultWebShop.Services
             if (!role.Succeeded)
                 throw new Exception("Error adding user to role");
             return user;
+        }
+
+        public async Task<UserViewModel> GetUser(string userid)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == userid);
+            var role = await _userManager.GetRolesAsync(user);
+            if (user == null)
+                throw new Exception("User does not exist (id: " + userid + ")");
+            var model = new UserViewModel
+            {
+                Birthdate = user.Birthdate,
+                Email = user.Email,
+                Role = role.First()
+            };
+            return model;
+        }
+
+        public async Task<IEnumerable<ApplicationUser>> GetUsers()
+        {
+            var users = await _context.Users.ToListAsync();
+            return users;
         }
     }
 }

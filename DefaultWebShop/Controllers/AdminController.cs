@@ -60,6 +60,23 @@ namespace DefaultWebShop.Controllers
             await _adminService.CreateUser(model);
             return View(nameof(Index));
         }
+        public async Task<IActionResult> EditUser()
+        {
+            await LoadUsers();
+            return View();
+        }
+
+        public async Task<IActionResult> EditUserDetails(string userid)
+        {
+            var user = await _adminService.GetUser(userid);
+            return View(user);
+        }
+        private async Task LoadUsers()
+        {
+            var users = await _adminService.GetUsers();
+            ViewBag.Users = new SelectList(users, "Id", "Email");
+        }
+
         private async Task LoadGenres()
         {
             var genres = await _genreService.GetGenres();

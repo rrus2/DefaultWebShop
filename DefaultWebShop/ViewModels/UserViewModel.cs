@@ -8,11 +8,11 @@ namespace DefaultWebShop.ViewModels
 {
     public class UserViewModel
     {
+        public string Id { get; set; }
         [Required]
         [DataType(DataType.EmailAddress)]
         public string Email { get; set; }
         [Required]
-        [DataType(DataType.Date)]
         public DateTime Birthdate { get; set; }
         [Required]
         public string Role { get; set; }

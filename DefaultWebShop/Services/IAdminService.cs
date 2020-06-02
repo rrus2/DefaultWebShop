@@ -12,5 +12,6 @@ namespace DefaultWebShop.Services
         Task<ApplicationUser> CreateUser(UserViewModel model);
         Task<IEnumerable<ApplicationUser>> GetUsers();
         Task<UserViewModel> GetUser(string userid);
+        Task<ApplicationUser> UpdateUser(UserViewModel model);
     }
 }

@@ -55,5 +55,22 @@ namespace DefaultWebShop.Services
             var users = await _context.Users.ToListAsync();
             return users;
         }
+
+        public async Task<ApplicationUser> UpdateUser(UserViewModel model)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == model.Id);
+            if (user == null)
+                throw new Exception("User not found");
+            user.Email = model.Email;
+            user.UserName = model.Email;
+            user.Birthdate = model.Birthdate;
+            var role = await _userManager.GetRolesAsync(user);
+            await _userManager.RemoveFromRoleAsync(user, role.ToString());
+            await _userManager.AddToRoleAsync(user, model.Role);
+            await _userManager.RemovePasswordAsync(user);
+            await _userManager.AddPasswordAsync(user, model.Password);
+            await _context.SaveChangesAsync();
+            return user;
+        }
     }
 }

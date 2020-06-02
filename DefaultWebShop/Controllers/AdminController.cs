@@ -69,7 +69,20 @@ namespace DefaultWebShop.Controllers
         public async Task<IActionResult> EditUserDetails(string userid)
         {
             var user = await _adminService.GetUser(userid);
+            await LoadRoles();
             return View(user);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditUserPage(UserViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                await LoadRoles();
+                return View(model);
+            }         
+            await _adminService.UpdateUser(model);
+            return View(nameof(Index));
         }
         private async Task LoadUsers()
         {

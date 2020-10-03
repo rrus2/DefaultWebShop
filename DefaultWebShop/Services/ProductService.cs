@@ -24,6 +24,22 @@ namespace DefaultWebShop.Services
         {
             if (model == null)
                 throw new Exception("ProductViewModel cannot be null");
+
+            if (model.Name == null || model.Name == string.Empty)
+                throw new Exception("Product name can not be null or empty");
+
+            if (model.Price <= 0)
+                throw new Exception("Product price can not be zero or less than");
+
+            if (model.Stock <= 0)
+                throw new Exception("Product stock can not be zero or less than");
+
+            if (model.Amount <= 0)
+                throw new Exception("Product amout can not be zero or less than");
+
+            if (model.GenreID <= 0)
+                throw new Exception("Product genre must be provided");
+
             var product = new Product { Name = model.Name, Price = model.Price, ImagePath = model.ImagePath, Stock = model.Stock, GenreID = model.GenreID };
             if(file != null)
             {
@@ -96,9 +112,27 @@ namespace DefaultWebShop.Services
         {
             if (id == 0 || id < 0)
                 throw new Exception("Can not update product with id 0");
+
+            if (model.Name == null || model.Name == string.Empty)
+                throw new Exception("Product name can not be null or empty");
+
+            if (model.Price <= 0)
+                throw new Exception("Product price can not be zero or less than");
+
+            if (model.Stock <= 0)
+                throw new Exception("Product stock can not be zero or less than");
+
+            if (model.Amount <= 0)
+                throw new Exception("Product amout can not be zero or less than");
+
+            if (model.GenreID <= 0)
+                throw new Exception("Product genre must be provided");
+
             var product = await _context.Products.Include(x => x.Genre).FirstOrDefaultAsync(x => x.ProductID == id);
+
             if (product == null)
                 throw new Exception($"Product with id {id} is null");
+
             try
             {
                 product.Name = model.Name;

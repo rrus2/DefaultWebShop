@@ -19,6 +19,8 @@ namespace DefaultWebShop.Services
         {
             if (model == null)
                 throw new Exception("GenreViewModel cannot be null");
+            if (model.Name == null || model.Name == "")
+                throw new Exception("Name can not be null or empty");
             var genre = new Genre { Name = model.Name };
             try
             {
@@ -69,11 +71,18 @@ namespace DefaultWebShop.Services
         {
             if (id == 0 || id < 0)
                 throw new Exception($"Can not update genre with id {id}");
+
             if (model == null)
                 throw new Exception("GenreViewModel is null");
+
+            if (model.Name == null || model.Name == "")
+                throw new Exception("Genre name can not be null or empty");
+
             var genre = await _context.Genres.FirstOrDefaultAsync(x => x.GenreID == id);
+
             if (genre == null)
                 throw new Exception("Genre not found");
+
             genre.Name = model.Name;
             try
             {

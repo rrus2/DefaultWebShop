@@ -3,10 +3,15 @@ using DefaultWebShop.Migrations;
 using DefaultWebShop.Models;
 using DefaultWebShop.Services;
 using DefaultWebShop.ViewModels;
+using DefaultWebShopTests.ProductTests;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.OAuth.Claims;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -15,6 +20,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace DefaultWebShopTests.GenreTests
@@ -22,16 +28,16 @@ namespace DefaultWebShopTests.GenreTests
     public class ProductsControllerTests : IDisposable
     {
         private readonly ApplicationDbContext _context;
+        private PasswordHasher<ApplicationUser> _passwordHasher;
         private ProductService _productService;
         private GenreService _genreService;
         private OrderService _orderService;
         private ProductsController _controller;
         private UserManager<ApplicationUser> _userManager;
-        private SignInManager<ApplicationUser> _singInManager;
         private UserStore<ApplicationUser> _userStore;
         private HttpContextAccessor _contextAccessor;
-        private UserClaimsPrincipalFactory<ApplicationUser> _claimsFactory;
-        private IdentityOptions _identityOptions;
+        private HttpContext _httpContext;
+        private ControllerBase _controllerBase;
 
         public ProductsControllerTests()
         {
@@ -42,21 +48,19 @@ namespace DefaultWebShopTests.GenreTests
             _context = new ApplicationDbContext(options);
             _context.Database.EnsureCreated();
 
-            _identityOptions = new IdentityOptions();
+            _passwordHasher = new PasswordHasher<ApplicationUser>();
             _contextAccessor = new HttpContextAccessor();
             _userStore =  new UserStore<ApplicationUser>(_context);
             _productService = new ProductService(_context, null);
             _genreService = new GenreService(_context);
             _orderService = new OrderService(_context);
-            _userManager = new UserManager<ApplicationUser>(_userStore, null, null, null, null, null, null, null, null);
-            _claimsFactory = new UserClaimsPrincipalFactory<ApplicationUser>(_userManager, null);
-            _singInManager = new SignInManager<ApplicationUser>(_userManager, _contextAccessor, _claimsFactory, null, null, null, null);
+            _userManager = new UserManager<ApplicationUser>(_userStore, null, _passwordHasher, null, null, null, null, null, null);
 
             _controller = new ProductsController(_productService, _genreService, _userManager, _orderService);
+
             SeedGenres(_context);
             SeedProducts(_context);
-            SeedUser(_context);
-            
+            SeedUser();
         }
 
         [Fact]
@@ -87,8 +91,8 @@ namespace DefaultWebShopTests.GenreTests
         [Fact]
         public async void PostProductDetails()
         {
+            var result = await _controller.Details(1, 2) as ViewResult;
             var user = await _userManager.FindByNameAsync("pavel.ivanko@hotmail.com");
-            await _singInManager.SignInAsync(user, true);
 
         }
         private void SeedGenres(ApplicationDbContext context)
@@ -114,7 +118,7 @@ namespace DefaultWebShopTests.GenreTests
             _context.Products.AddRange(products);
             _context.SaveChanges();
         }
-        private void SeedUser(ApplicationDbContext _context)
+        private async void SeedUser()
         {
             var user = new ApplicationUser
             {
@@ -123,7 +127,30 @@ namespace DefaultWebShopTests.GenreTests
                 Birthdate = Convert.ToDateTime("30/07/1991")
             };
 
-            _userManager.CreateAsync(user, "test12345_!");
+            var r = await _userManager.CreateAsync(user, "tesT1234567_!");
+
+            if (!r.Succeeded)
+                throw new Exception("LOL OK");
+
+            var claim = new Claim("type", "value", "valueType", "pavel.ivanko@hotmail.com", "pavel.ivanko@hotmail.com");
+            var claims = new List<Claim>() { claim };
+            var ci = new ClaimsIdentity(claims);
+            var p = new ClaimsPrincipal(ci);
+
+            await _userManager.AddClaimAsync(user, claim);
+
+            _controller.ControllerContext = new ControllerContext(new ActionContext
+            {
+                HttpContext = new DefaultHttpContext(),
+                RouteData = new RouteData(),
+                ActionDescriptor = new ControllerActionDescriptor()
+            });
+
+            UserClaimsPrincipalFactory<ApplicationUser> userClaimsPrincipalFactory = new UserClaimsPrincipalFactory<ApplicationUser>(_userManager, null);
+
+            var ucpf = await userClaimsPrincipalFactory.CreateAsync(user);
+
+            _controller.ControllerContext.HttpContext.User = ucpf;
         }
         public void Dispose()
         {

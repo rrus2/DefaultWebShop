@@ -6,6 +6,8 @@
 
 <h1>Products</h1>
 
+<partial name="_SearchPartial" />
+
 @if (User.IsInRole("Admin"))
 {
     <p>
@@ -35,8 +37,8 @@
     var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
     var nextDisabled = !Model.HasNextPage ? "disabled" : "";
 }
-<a asp-action="Index" asp-route-pageNumber="@(1)" class="btn btn-default @prevDisabled">First page</a>
-<a asp-action="Index"
+<a asp-action="ProductsByGenre" asp-route-pageNumber="@(1)" class="btn btn-default @prevDisabled">First page</a>
+<a asp-action="ProductsByGenre"
    asp-route-pageNumber="@(Model.CurrentPage - 1)"
    class="btn btn-default @prevDisabled">
     Previous
@@ -44,13 +46,13 @@
 
 @for (int i = 1; i < Model.TotalPages + 1; i++)
 {
-    <a class="btn btn-primary @(i == Model.CurrentPage ? "active" : "")" asp-action="Index" asp-route-pageNumber="@(i)">@i</a>
+    <a class="btn btn-primary @(i == Model.CurrentPage ? "active" : "")" asp-action="ProductsByGenre" asp-route-pageNumber="@(i)">@i</a>
 }
 
-<a asp-action="Index"
+<a asp-action="ProductsByGenre"
    asp-route-pageNumber="@(Model.CurrentPage + 1)"
    class="btn btn-default @nextDisabled">
     Next
 </a>
-<a asp-action="Index" asp-route-pageNumber="@(Model.TotalPages)" class="btn btn-default @nextDisabled">Last page</a>
+<a asp-action="ProductsByGenre" asp-route-pageNumber="@(Model.TotalPages)" class="btn btn-default @nextDisabled">Last page</a>
 

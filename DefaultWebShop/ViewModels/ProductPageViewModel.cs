@@ -29,5 +29,9 @@ namespace DefaultWebShop.ViewModels
         }
         public int TotalPages => (int)Math.Ceiling(Count / (double)PageSize);
         public IEnumerable<Product> Products { get; set; }
+        public int GenreID { get; set; }
+        public string Name { get; set; }
+        public int? MinValue { get; set; }
+        public int? MaxValue { get; set; }
     }
 }

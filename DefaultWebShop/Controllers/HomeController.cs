@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using DefaultWebShop.Models;
 using Microsoft.AspNetCore.Identity;
 using DefaultWebShop.Services;
+using DefaultWebShop.ViewModels;
 
 namespace DefaultWebShop.Controllers
 {
@@ -25,7 +26,7 @@ namespace DefaultWebShop.Controllers
         public async Task<IActionResult> Index()
         {
             var count = await _productService.GetCount();
-            var products = await _productService.GetProducts(0, count);
+            var products = await _productService.GetProducts(1, count);
             var productsRandom = RandomizeProducts(products);
             return View(productsRandom);
         }

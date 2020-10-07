@@ -1,0 +1,81 @@
+﻿@inject DefaultWebShop.Services.IGenreService _genreService;
+
+@{
+    var test = new DefaultWebShop.ViewModels.ProductViewModel();
+    var list = await _genreService.GetGenres();
+    var selectGenre = new SelectList(list, "GenreID", "Name");
+    var productPageModel = (DefaultWebShop.ViewModels.ProductPageViewModel)ViewData["ProductPageModel"];
+}
+
+<div class="jumbotron text-center">
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+        Search products
+    </button>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                @if (productPageModel == null)
+                {
+                    <form asp-controller="Products" asp-action="SearchProducts" method="post" class="form text-center">
+                        <div class="form-group">
+                            <input placeholder="Name" type="text" class="form-control" name="name" />
+                        </div>
+                        <div class="form-group">
+                            <input type="text" name="minprice" class="form-control-sm" placeholder="Min. Price" />
+                            <input type="text" name="maxprice" class="form-control-sm" placeholder="Max. Price" />
+                        </div>
+                        <div class="form-group">
+                            <select class="form-control" asp-for="@test.GenreID" asp-items="@selectGenre" name="genreID">
+                                <option>Select a genre</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <input type="submit" class="btn btn-primary" value="Search" />
+                        </div>
+                    </form>
+                }
+                else
+                {
+                    <form onload="RememberGenre(@productPageModel.GenreID)" asp-controller="Products" asp-action="SearchProducts" method="post" class="form text-center">
+                        <div class="form-group">
+                            <input placeholder="Name" type="text" class="form-control" name="name" value="@productPageModel.Name"/>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" name="minprice" class="form-control-sm" placeholder="Min. Price" value="@(productPageModel.MinValue != null ? productPageModel.MinValue : null)" />
+                            <input type="text" name="maxprice" class="form-control-sm" placeholder="Max. Price" value="@(productPageModel.MaxValue != null ? productPageModel.MaxValue : null)" />
+                        </div>
+                        <div class="form-group">
+                            <select id="genreSelect" class="form-control" asp-for="@test.GenreID" asp-items="@selectGenre" name="genreID">
+                                <option>Select a genre</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <input type="submit" class="btn btn-primary" value="Search" />
+                            <input type="button" class="btn btn-secondary" value="Reset" />
+                        </div>
+                    </form>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function RememberGenre(genreID) {
+        console.log(genreID);
+        if (genreID > 0) {
+            let selectList = document.getElementById("genreSelect");
+            selectList.selectedIndex = genreID;
+        }
+    }
+</script>

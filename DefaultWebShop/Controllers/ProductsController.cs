@@ -80,16 +80,31 @@ namespace DefaultWebShop.Controllers
         }
         public async Task<IActionResult> ProductsByGenre(int id, int? pageNumber = 1, int size = 3)
         {
-            var genre = await _genreService.GetGenre(id);
-            var products = await _productService.GetProducts(pageNumber, size);
-            var genreproducts = products.Where(x => x.GenreID == genre.GenreID);
+            var products = await _productService.GetProductsByGenre(pageNumber, size, id);
             var genreproductsviewmodel = new ProductPageViewModel 
             { 
-                Count = await _productService.GetCount(), 
+                Count = await _productService.GetCountByGenreID(id), 
                 CurrentPage = (int)pageNumber, 
-                Products = genreproducts 
+                Products = products 
             };
             return View(genreproductsviewmodel);
+        }
+        public async Task<IActionResult> SearchProducts(string name, int minvalue, int maxvalue, int genreID, int? pageNumber = 1, int size = 3)
+        {
+            var products = await _productService.GetProductsBySearch(pageNumber, size, genreID, name, minvalue, maxvalue);
+            var searchproductsviewmodel = new ProductPageViewModel
+            {
+                Count = await _productService.GetCountBySearch(genreID, name, minvalue, maxvalue),
+                CurrentPage = (int)pageNumber,
+                Products = products,
+                Name = name,
+                GenreID = genreID,
+                MinValue = minvalue,
+                MaxValue = maxvalue
+
+            };
+            return View(searchproductsviewmodel);
+
         }
         private async Task LoadGenres()
         {

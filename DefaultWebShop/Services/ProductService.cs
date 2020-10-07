@@ -88,6 +88,28 @@ namespace DefaultWebShop.Services
             return products.Count;
         }
 
+        public async Task<int> GetCountByGenreID(int genreID)
+        {
+            var products = await _context.Products.Where(x => x.GenreID == genreID).ToListAsync();
+            return products.Count;
+        }
+
+        public async Task<int> GetCountBySearch(int genreID, string name, int minvalue, int maxvalue)
+        {
+            var products = _context.Products.AsQueryable();
+            if (genreID > 0)
+                products = products.Where(x => x.GenreID == genreID);
+            if (name != null && name != string.Empty)
+                products = products.Where(x => x.Name.ToLower().Contains(name.ToLower()));
+            if (minvalue > 0)
+                products = products.Where(x => x.Price > minvalue);
+            if (maxvalue > 0)
+                products = products.Where(x => x.Price > maxvalue);
+            if (minvalue > 0 && maxvalue > 0)
+                products = products.Where(x => x.Price > minvalue && x.Price < maxvalue);
+            return await products.CountAsync();
+        }
+
         public async Task<Product> GetProduct(int id)
         {
             if (id == 0 || id < 0)
@@ -100,12 +122,40 @@ namespace DefaultWebShop.Services
 
         public async Task<IEnumerable<Product>> GetProducts(int? pageNumber, int size)
         {
-            var products = _context.Products.Include(x => x.Genre).AsEnumerable();
+            var products = _context.Products.Include(x => x.Genre).AsQueryable();
             if (pageNumber != null)
-            {
+                products = products.OrderBy(x => x.Name).Skip(((int)pageNumber - 1) * size).Take(size);
+            var productsToReturn = await products.ToListAsync();
+            
+            return productsToReturn;
+        }
+
+        public async Task<IEnumerable<Product>> GetProductsByGenre(int? pageNumber, int size, int genreID)
+        {
+            var products = _context.Products.Include(x => x.Genre).Where(x => x.GenreID == genreID).AsQueryable();
+            if (pageNumber != null)
                 products = products.OrderBy(x => x.Name).Skip(((int)pageNumber - 1) * (int)size).Take((int)size);
-            }
-            return products.ToList();
+
+            return await products.ToListAsync();
+        }
+
+        public async Task<IEnumerable<Product>> GetProductsBySearch(int? pageNumber, int size, int genreID, string name, int? minvalue, int? maxvalue)
+        {
+            var products = _context.Products.Include(x => x.Genre).AsQueryable();
+            if (name != null && name != string.Empty)
+                products = products.Where(x => x.Name.ToLower().Contains(name.ToLower()));
+            if (minvalue > 0 && minvalue != null)
+                products = products.Where(x => x.Price > minvalue);
+            if (maxvalue > 0 && maxvalue != null)
+                products = products.Where(x => x.Price > maxvalue);
+            if (minvalue > 0 && maxvalue > 0 && minvalue != null && maxvalue != null)
+                products = products.Where(x => x.Price > minvalue && x.Price < maxvalue);
+            if (genreID > 0)
+                products = products.Where(x => x.GenreID == genreID);
+            if (pageNumber != null)
+                products = products.OrderBy(x => x.Name).Skip(((int)pageNumber - 1) * (int)size).Take((int)size);
+
+            return await products.ToListAsync();
         }
 
         public async Task<Product> UpdateProduct(int id, ProductViewModel model)

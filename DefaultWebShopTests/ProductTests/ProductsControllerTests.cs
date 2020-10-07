@@ -3,6 +3,7 @@ using DefaultWebShop.Migrations;
 using DefaultWebShop.Models;
 using DefaultWebShop.Services;
 using DefaultWebShop.ViewModels;
+using DefaultWebShopTests.Fixture;
 using DefaultWebShopTests.ProductTests;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OAuth.Claims;
@@ -18,6 +19,7 @@ using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,7 +27,7 @@ using Xunit;
 
 namespace DefaultWebShopTests.GenreTests
 {
-    public class ProductsControllerTests : IDisposable
+    public class ProductsControllerTests : IDisposable, IClassFixture<DbFixture>
     {
         private readonly ApplicationDbContext _context;
         private PasswordHasher<ApplicationUser> _passwordHasher;
@@ -35,9 +37,11 @@ namespace DefaultWebShopTests.GenreTests
         private ProductsController _controller;
         private UserManager<ApplicationUser> _userManager;
         private UserStore<ApplicationUser> _userStore;
+        private SignInManager<ApplicationUser> _signInManager;
         private HttpContextAccessor _contextAccessor;
-        private HttpContext _httpContext;
-        private ControllerBase _controllerBase;
+        private IOptions<IdentityOptions> _identityOptions;
+        private IdentityOptions _iOptions;
+        private UserClaimsPrincipalFactory<ApplicationUser> _claimsFactory;
 
         public ProductsControllerTests()
         {
@@ -48,6 +52,9 @@ namespace DefaultWebShopTests.GenreTests
             _context = new ApplicationDbContext(options);
             _context.Database.EnsureCreated();
 
+            _iOptions = new IdentityOptions();
+            _iOptions.Password.RequireDigit = true;
+            _identityOptions = _iOptions as IOptions<IdentityOptions>; 
             _passwordHasher = new PasswordHasher<ApplicationUser>();
             _contextAccessor = new HttpContextAccessor();
             _userStore =  new UserStore<ApplicationUser>(_context);
@@ -55,11 +62,13 @@ namespace DefaultWebShopTests.GenreTests
             _genreService = new GenreService(_context);
             _orderService = new OrderService(_context);
             _userManager = new UserManager<ApplicationUser>(_userStore, null, _passwordHasher, null, null, null, null, null, null);
+            _claimsFactory = new UserClaimsPrincipalFactory<ApplicationUser>(_userManager, _identityOptions);
+            _signInManager = new SignInManager<ApplicationUser>(_userManager, _contextAccessor, _claimsFactory,  _identityOptions, null, null, null);
 
             _controller = new ProductsController(_productService, _genreService, _userManager, _orderService);
 
-            SeedGenres(_context);
-            SeedProducts(_context);
+            SeedGenres();
+            SeedProducts();
             SeedUser();
         }
 
@@ -95,7 +104,7 @@ namespace DefaultWebShopTests.GenreTests
             var user = await _userManager.FindByNameAsync("pavel.ivanko@hotmail.com");
 
         }
-        private void SeedGenres(ApplicationDbContext context)
+        private void SeedGenres()
         {
             var genres = new List<Genre>()
             {
@@ -107,7 +116,7 @@ namespace DefaultWebShopTests.GenreTests
             _context.SaveChanges();
         }
 
-        private void SeedProducts(ApplicationDbContext context)
+        private void SeedProducts()
         {
             var products = new List<Product>()
             {

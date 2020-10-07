@@ -8,9 +8,18 @@
 }
 
 <div class="jumbotron text-center">
-    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
-        Search products
-    </button>
+    @if (productPageModel == null)
+    {
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+            Search products
+        </button>
+    }
+    else
+    {
+        <button onclick="RememberGenre(@productPageModel?.GenreID)" type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+            Search products
+        </button>
+    }
 </div>
 
 <!-- Modal -->
@@ -46,22 +55,26 @@
                 }
                 else
                 {
-                    <form onload="RememberGenre(@productPageModel.GenreID)" asp-controller="Products" asp-action="SearchProducts" method="post" class="form text-center">
+                    <form asp-controller="Products" asp-action="SearchProducts" method="post" class="form text-center">
                         <div class="form-group">
                             <input placeholder="Name" type="text" class="form-control" name="name" value="@productPageModel.Name"/>
                         </div>
                         <div class="form-group">
-                            <input type="text" name="minprice" class="form-control-sm" placeholder="Min. Price" value="@(productPageModel.MinValue != null ? productPageModel.MinValue : null)" />
-                            <input type="text" name="maxprice" class="form-control-sm" placeholder="Max. Price" value="@(productPageModel.MaxValue != null ? productPageModel.MaxValue : null)" />
+                            <input type="text" name="minprice" class="form-control-sm" placeholder="Min. Price" value="@(productPageModel.MinValue != 0 ? productPageModel.MinValue : null)" />
+                            <input type="text" name="maxprice" class="form-control-sm" placeholder="Max. Price" value="@(productPageModel.MaxValue != 0 ? productPageModel.MaxValue : null)" />
                         </div>
                         <div class="form-group">
-                            <select id="genreSelect" class="form-control" asp-for="@test.GenreID" asp-items="@selectGenre" name="genreID">
+                            <select id="genreSelect" class="form-control" asp-for="@test.GenreID" name="genreID">
                                 <option>Select a genre</option>
+                                @foreach (var genre in selectGenre)
+                                {
+                                    <option id="selectedGenre" value="@genre.Value">@genre.Text</option>
+                                }
                             </select>
                         </div>
                         <div class="form-group">
                             <input type="submit" class="btn btn-primary" value="Search" />
-                            <input type="button" class="btn btn-secondary" value="Reset" />
+                            <input type="submit" class="btn btn-secondary" value="Reset" asp-controller="Home" asp-action="Index" />
                         </div>
                     </form>
                 }

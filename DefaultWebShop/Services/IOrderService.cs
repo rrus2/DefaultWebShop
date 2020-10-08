@@ -10,5 +10,7 @@ namespace DefaultWebShop.Services
     {
         Task<Order> CreateOrder(string userid, int productid, int amount);
         Task<Order> DeleteOrder(int orderid);
+        Task<IEnumerable<Order>> GetOrders();
+        Task<IEnumerable<Order>> GetOrdersByUser(string id);
     }
 }

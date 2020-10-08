@@ -16,6 +16,8 @@ namespace DefaultWebShop.Services
         }
         public async Task<Order> CreateOrder(string userid, int productid, int amount)
         {
+            if (amount == 0 || amount < 0)
+                throw new Exception("Amount can not be 0 or less than");
             var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == userid);
             if (user == null)
                 throw new Exception("User does not exist for this order");
@@ -39,6 +41,8 @@ namespace DefaultWebShop.Services
 
         public async Task<Order> DeleteOrder(int orderid)
         {
+            if (orderid == 0 || orderid < 0)
+                throw new Exception("OrderID can not be 0 or less than");
             var order = await _context.Orders.FirstOrDefaultAsync(x => x.OrderID == orderid);
             try
             {
@@ -50,6 +54,20 @@ namespace DefaultWebShop.Services
                 throw new Exception(ex.Message);
             }
             return order;
+        }
+
+        public async Task<IEnumerable<Order>> GetOrders()
+        {
+            return await _context.Orders.ToListAsync();
+        }
+
+        public async Task<IEnumerable<Order>> GetOrdersByUser(string id)
+        {
+            if (id == null || id == string.Empty)
+                throw new Exception("UserIDD can not be null or empty");
+            var ordersByUser = await GetOrders();
+
+            return ordersByUser.Where(x => x.ApplicationUser.Id == id).ToList();
         }
     }
 }

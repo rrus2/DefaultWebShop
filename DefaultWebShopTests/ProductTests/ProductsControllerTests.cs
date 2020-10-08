@@ -12,8 +12,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Moq;
 using System;
@@ -21,6 +23,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Security.Claims;
+using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 using Xunit;
@@ -30,48 +33,41 @@ namespace DefaultWebShopTests.GenreTests
     public class ProductsControllerTests : IDisposable, IClassFixture<DbFixture>
     {
         private readonly ApplicationDbContext _context;
-        private PasswordHasher<ApplicationUser> _passwordHasher;
         private ProductService _productService;
         private GenreService _genreService;
         private OrderService _orderService;
         private ProductsController _controller;
         private UserManager<ApplicationUser> _userManager;
-        private UserStore<ApplicationUser> _userStore;
         private SignInManager<ApplicationUser> _signInManager;
-        private HttpContextAccessor _contextAccessor;
-        private IOptions<IdentityOptions> _identityOptions;
-        private IdentityOptions _iOptions;
-        private UserClaimsPrincipalFactory<ApplicationUser> _claimsFactory;
+        private RoleManager<IdentityRole> _roleManager;
+        private readonly ServiceProvider _provider;
 
-        public ProductsControllerTests()
+        public ProductsControllerTests(DbFixture fixture)
         {
-            var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-                .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
-                .Options;
+            _provider = fixture.Provider;
 
-            _context = new ApplicationDbContext(options);
+            _context = _provider.GetService<ApplicationDbContext>();
             _context.Database.EnsureCreated();
-
-            _iOptions = new IdentityOptions();
-            _iOptions.Password.RequireDigit = true;
-            _identityOptions = _iOptions as IOptions<IdentityOptions>; 
-            _passwordHasher = new PasswordHasher<ApplicationUser>();
-            _contextAccessor = new HttpContextAccessor();
-            _userStore =  new UserStore<ApplicationUser>(_context);
+            
             _productService = new ProductService(_context, null);
             _genreService = new GenreService(_context);
             _orderService = new OrderService(_context);
-            _userManager = new UserManager<ApplicationUser>(_userStore, null, _passwordHasher, null, null, null, null, null, null);
-            _claimsFactory = new UserClaimsPrincipalFactory<ApplicationUser>(_userManager, _identityOptions);
-            _signInManager = new SignInManager<ApplicationUser>(_userManager, _contextAccessor, _claimsFactory,  _identityOptions, null, null, null);
+
+            _roleManager = _provider.GetService<RoleManager<IdentityRole>>();
+            _userManager = _provider.GetService<UserManager<ApplicationUser>>();
+            _signInManager = _provider.GetService<SignInManager<ApplicationUser>>();
 
             _controller = new ProductsController(_productService, _genreService, _userManager, _orderService);
 
-            SeedGenres();
-            SeedProducts();
-            SeedUser();
+            if(_context.Genres.Count() == 0)
+                SeedGenres();
+            if(_context.Products.Count() == 0)
+                SeedProducts();
+            if(_context.Roles.Count() == 0)
+                SeedRoles();
+            if(_context.Users.Count() == 0)
+                SeedUser();
         }
-
         [Fact]
         public async void IndexReturnsListOfProducts()
         {
@@ -101,9 +97,106 @@ namespace DefaultWebShopTests.GenreTests
         public async void PostProductDetails()
         {
             var result = await _controller.Details(1, 2) as ViewResult;
-            var user = await _userManager.FindByNameAsync("pavel.ivanko@hotmail.com");
+            var user = await _userManager.FindByNameAsync("pavel@hotmail.com");
+
+            Assert.NotNull(user);
 
         }
+        [Fact]
+        public async void CreateProductTestGetPageWorks()
+        {
+            var result = await _controller.Create() as ViewResult;
+            var genres = (SelectList)result.ViewData["Genres"];
+            var genresCount = genres.Count();
+
+            Assert.Equal(3, genresCount);
+        }
+        [Fact]
+        public async void CreateProductTestPostPageWorks()
+        {
+            var productviewmodel = new ProductViewModel
+            {
+                Name = "Nike",
+                Price = 50,
+                Amount = 50,
+                Stock = 5,
+                GenreID = 1
+            };
+            var result = await _controller.Create(productviewmodel, null);
+            var product = await _productService.GetProductsByName(productviewmodel.Name);
+
+            Assert.NotNull(product);
+            Assert.Equal(productviewmodel.Name, product.First().Name);
+        }
+        [Fact]
+        public async void CreateProductTestPageFailsWithBadModel()
+        {
+            var productviewmodel = new ProductViewModel();
+            await Assert.ThrowsAsync<Exception>(() => _controller.Create(productviewmodel, null));
+        }
+        [Theory]
+        [InlineData("", 50, 50, 5, 1)]
+        [InlineData("Nike", 0, 50, 5, 1)]
+        [InlineData("Nike", 50, 0, 5, 1)]
+        [InlineData("Nike", 50, 50, 0, 1)]
+        [InlineData("Nike", 50, 50, 5, 0)]
+        [InlineData("", 0, 0, 0, 0)]
+        [InlineData(null, -1, -1, -1, -1)]
+        public async void CreateProductTestFailsWithBadModelData(string name, int price, int amount, int stock, int genreid)
+        {
+            var productVM = new ProductViewModel
+            {
+                Name = name,
+                Price = price,
+                Amount = amount,
+                Stock = stock,
+                GenreID = genreid
+            };
+            await Assert.ThrowsAsync<Exception>(() => _controller.Create(productVM, null));
+        }
+
+        [Fact]
+        public async void GetProductsByGenreWorks()
+        {
+            var result = await _controller.ProductsByGenre(1, 1, 3) as ViewResult;
+            var productsCount = await _productService.GetCountByGenreID(1);
+            var products = await _productService.GetProductsByGenre(1, 3, 1);
+            var model = result.Model as ProductPageViewModel;
+
+            Assert.Equal(productsCount, model.Count);
+            Assert.Equal(model.Products, products);
+            Assert.Equal(model.Products.Count(), products.Count());
+            Assert.Equal(model.Products.First().Name, products.First().Name);
+            Assert.Equal(model.Products.Last().Name, products.Last().Name);
+        }
+        [Theory]
+        [InlineData(0)]
+        [InlineData(-1)]
+        [InlineData(5)]
+        public async void GetProductsByGenreFailsWithBadID(int id)
+        {
+            await Assert.ThrowsAsync<Exception>(() => _controller.ProductsByGenre(id, 1, 3));
+        }
+        [Fact]
+        public async void GetProductsBySearchCriteriaWorks()
+        {
+            var products = await _productService.GetProductsBySearch(1, 3, 1, "Product1", 10, 60);
+            var result = await _controller.SearchProducts("Product1", 20, 60, 1, 1, 3) as ViewResult;
+            var model = result.Model as ProductPageViewModel;
+
+            Assert.Equal(products, model.Products);
+            Assert.Equal(products.First().Name, model.Products.First().Name);
+            Assert.Equal(products.Last().Name, model.Products.Last().Name);
+        }
+        [Theory]
+        [InlineData("product", -1, 60, 1)]
+        [InlineData("product", 10, -1, 1)]
+        [InlineData("product", -1, -1, 0)]
+        public async void GetProductsBySearchCriteriaFails(string name, int? minprice, int? maxprice, int genreID)
+        {
+            await Assert.ThrowsAsync<Exception>(() => _controller.SearchProducts(name, minprice, maxprice, genreID, 1, 3));
+        }
+
         private void SeedGenres()
         {
             var genres = new List<Genre>()
@@ -127,26 +220,29 @@ namespace DefaultWebShopTests.GenreTests
             _context.Products.AddRange(products);
             _context.SaveChanges();
         }
+        private async void SeedRoles()
+        {
+            await _roleManager.CreateAsync(new IdentityRole { Name = "Admin" });
+            await _roleManager.CreateAsync(new IdentityRole { Name = "User" });
+        }
+
         private async void SeedUser()
         {
             var user = new ApplicationUser
             {
-                Email = "pavel.ivanko@hotmail.com",
-                UserName = "pavel.ivanko@hotmail.com",
+                Email = "pavel@hotmail.com",
+                UserName = "pavel@hotmail.com",
                 Birthdate = Convert.ToDateTime("30/07/1991")
             };
 
             var r = await _userManager.CreateAsync(user, "tesT1234567_!");
 
-            if (!r.Succeeded)
-                throw new Exception("LOL OK");
+            await _userManager.AddToRoleAsync(user, "Admin");
+            await _userManager.AddToRoleAsync(user, "User");
 
-            var claim = new Claim("type", "value", "valueType", "pavel.ivanko@hotmail.com", "pavel.ivanko@hotmail.com");
-            var claims = new List<Claim>() { claim };
-            var ci = new ClaimsIdentity(claims);
-            var p = new ClaimsPrincipal(ci);
+            var rolesStr = new string[2] { "Admin", "User" };
 
-            await _userManager.AddClaimAsync(user, claim);
+            var claim = new GenericPrincipal(new ClaimsIdentity(user.UserName), rolesStr);
 
             _controller.ControllerContext = new ControllerContext(new ActionContext
             {
@@ -155,16 +251,12 @@ namespace DefaultWebShopTests.GenreTests
                 ActionDescriptor = new ControllerActionDescriptor()
             });
 
-            UserClaimsPrincipalFactory<ApplicationUser> userClaimsPrincipalFactory = new UserClaimsPrincipalFactory<ApplicationUser>(_userManager, null);
-
-            var ucpf = await userClaimsPrincipalFactory.CreateAsync(user);
-
-            _controller.ControllerContext.HttpContext.User = ucpf;
+            _controller.HttpContext.User = claim;
         }
+
         public void Dispose()
         {
-            _context.Database.EnsureDeleted();
-            _context.Dispose();
+
         }
     }
 }

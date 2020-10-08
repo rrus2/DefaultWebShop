@@ -102,9 +102,9 @@ namespace DefaultWebShop.Services
             if (name != null && name != string.Empty)
                 products = products.Where(x => x.Name.ToLower().Contains(name.ToLower()));
             if (minvalue > 0)
-                products = products.Where(x => x.Price > minvalue);
+                products = products.Where(x => x.Price >= minvalue);
             if (maxvalue > 0)
-                products = products.Where(x => x.Price > maxvalue);
+                products = products.Where(x => x.Price <= maxvalue);
             if (minvalue > 0 && maxvalue > 0)
                 products = products.Where(x => x.Price > minvalue && x.Price < maxvalue);
             return await products.CountAsync();
@@ -120,6 +120,14 @@ namespace DefaultWebShop.Services
             return product;
         }
 
+        public async Task<IEnumerable<Product>> GetProductsByName(string name)
+        {
+            var products = _context.Products.Include(x => x.Genre).AsQueryable();
+            if (name != null && name != string.Empty)
+                products = products.Where(x => x.Name.ToLower().Contains(name.ToLower()));
+            return await products.ToListAsync();
+        }
+
         public async Task<IEnumerable<Product>> GetProducts(int? pageNumber, int size)
         {
             var products = _context.Products.Include(x => x.Genre).AsQueryable();
@@ -132,6 +140,9 @@ namespace DefaultWebShop.Services
 
         public async Task<IEnumerable<Product>> GetProductsByGenre(int? pageNumber, int size, int genreID)
         {
+            var count = await GetCount();
+            if (genreID == 0 || genreID < 0 || genreID > count)
+                throw new Exception("Genre can not be 0 or less than");
             var products = _context.Products.Include(x => x.Genre).Where(x => x.GenreID == genreID).AsQueryable();
             if (pageNumber != null)
                 products = products.OrderBy(x => x.Name).Skip(((int)pageNumber - 1) * (int)size).Take((int)size);
@@ -141,15 +152,19 @@ namespace DefaultWebShop.Services
 
         public async Task<IEnumerable<Product>> GetProductsBySearch(int? pageNumber, int size, int genreID, string name, int? minvalue, int? maxvalue)
         {
+            if (minvalue < 0)
+                throw new Exception("Minimum value can not be less than 0");
+            if (maxvalue < 0)
+                throw new Exception("Maximum value can not be less than 0");
             var products = _context.Products.Include(x => x.Genre).AsQueryable();
             if (name != null && name != string.Empty)
                 products = products.Where(x => x.Name.ToLower().Contains(name.ToLower()));
             if (minvalue > 0 && minvalue != null)
-                products = products.Where(x => x.Price > minvalue);
+                products = products.Where(x => x.Price >= minvalue);
             if (maxvalue > 0 && maxvalue != null)
-                products = products.Where(x => x.Price > maxvalue);
+                products = products.Where(x => x.Price <= maxvalue);
             if (minvalue > 0 && maxvalue > 0 && minvalue != null && maxvalue != null)
-                products = products.Where(x => x.Price > minvalue && x.Price < maxvalue);
+                products = products.Where(x => x.Price >= minvalue && x.Price <= maxvalue);
             if (genreID > 0)
                 products = products.Where(x => x.GenreID == genreID);
             if (pageNumber != null)

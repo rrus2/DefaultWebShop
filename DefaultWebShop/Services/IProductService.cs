@@ -17,6 +17,7 @@ namespace DefaultWebShop.Services
         Task<int> GetCountByGenreID(int genreID);
         Task<int> GetCountBySearch(int genreID, string name, int minvalue, int maxvalue);
         Task<Product> GetProduct(int id);
+        Task<IEnumerable<Product>> GetProductsByName(string name);
         Task<Product> CreateProduct(ProductViewModel model, IFormFile file);
         Task<Product> UpdateProduct(int id, ProductViewModel model);
         Task<Product> DeleteProduct(int id);

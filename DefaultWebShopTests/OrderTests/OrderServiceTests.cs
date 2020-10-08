@@ -13,25 +13,29 @@ using Xunit;
 
 namespace DefaultWebShopTests.OrderTests
 {
-    public class OrderServiceTests : IDisposable, IClassFixture<DbFixture>
+    public class OrderServiceTests : IClassFixture<DbFixture>, IDisposable
     {
+        private IServiceScope _scope;
         private readonly ApplicationDbContext _context;
-        private OrderService _orderService;
-        private UserManager<ApplicationUser> _userManager;
+        private readonly OrderService _orderService;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ServiceProvider _provider;
+        private readonly DbFixture _fixture;
         public OrderServiceTests(DbFixture fixture)
         {
-            _context = fixture.Provider.GetService<ApplicationDbContext>();
+            _fixture = fixture;
+            _scope = _fixture.Provider.GetService<IServiceScopeFactory>().CreateScope();
+            _provider = _fixture.Provider;
+
+            _context = _provider.GetService<ApplicationDbContext>();
             _context.Database.EnsureCreated();
 
             _orderService = new OrderService(_context);
-            _userManager = fixture.Provider.GetService<UserManager<ApplicationUser>>();
+            _userManager = _provider.GetService<UserManager<ApplicationUser>>();
 
-            if(_context.Genres.Count() == 0)
-                SeedGenres();
-            if(_context.Products.Count() == 0)
-                SeedProducts();
-            if (_context.Users.Count() == 0)
-                SeedUser();
+            SeedGenres();
+            SeedProducts();
+            SeedUser();
         }
 
         [Fact]
@@ -147,8 +151,12 @@ namespace DefaultWebShopTests.OrderTests
             if (!result.Succeeded)
                 throw new Exception("LOL OK");
         }
+
         public void Dispose()
         {
+            _context.Database.EnsureDeleted();
+            _context.Dispose();
+            _scope.Dispose();
         }
     }
 }

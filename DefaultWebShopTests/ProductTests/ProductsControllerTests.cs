@@ -48,7 +48,7 @@ namespace DefaultWebShopTests.GenreTests
 
             _context = _provider.GetService<ApplicationDbContext>();
             _context.Database.EnsureCreated();
-            
+
             _productService = new ProductService(_context, null);
             _genreService = new GenreService(_context);
             _orderService = new OrderService(_context);
@@ -59,13 +59,13 @@ namespace DefaultWebShopTests.GenreTests
 
             _controller = new ProductsController(_productService, _genreService, _userManager, _orderService);
 
-            if(_context.Genres.Count() == 0)
+            if (_context.Genres.Count() == 0)
                 SeedGenres();
-            if(_context.Products.Count() == 0)
+            if (_context.Products.Count() == 0)
                 SeedProducts();
-            if(_context.Roles.Count() == 0)
+            if (_context.Roles.Count() == 0)
                 SeedRoles();
-            if(_context.Users.Count() == 0)
+            if (_context.Users.Count() == 0)
                 SeedUser();
         }
         [Fact]
@@ -242,7 +242,11 @@ namespace DefaultWebShopTests.GenreTests
 
             var rolesStr = new string[2] { "Admin", "User" };
 
-            var claim = new GenericPrincipal(new ClaimsIdentity(user.UserName), rolesStr);
+            var claims = new List<Claim> {
+                new Claim(ClaimTypes.Name, "pavel@hotmail.com", ClaimValueTypes.String, "pavel@hotmail.com"),
+            };
+
+            var identity = new GenericPrincipal(new ClaimsIdentity(claims), rolesStr);
 
             _controller.ControllerContext = new ControllerContext(new ActionContext
             {
@@ -251,7 +255,7 @@ namespace DefaultWebShopTests.GenreTests
                 ActionDescriptor = new ControllerActionDescriptor()
             });
 
-            _controller.HttpContext.User = claim;
+            _controller.HttpContext.User = identity;
         }
 
         public void Dispose()

@@ -1,4 +1,5 @@
 ﻿using DefaultWebShop.Models;
+using DefaultWebShop.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -14,14 +15,19 @@ using System.Text;
 
 namespace DefaultWebShopTests.Fixture
 {
-    public class DbFixture : PageModel
+    public class DbFixture
     {
         
         public DbFixture()
         {
             var serviceCollection = new ServiceCollection()
                 .AddDbContext<ApplicationDbContext>(x => x.UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString()))
-                .AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders().Services.AddLogging().AddHttpContextAccessor();
+                .AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders().Services.AddLogging().AddHttpContextAccessor()
+                .AddScoped<IGenreService, GenreService>()
+                .AddScoped<IProductService, ProductService>()
+                .AddScoped<IOrderService, OrderService>()
+                .AddScoped<IAdminService, AdminService>()
+                .AddScoped<IShoppingCartService, ShoppingCartService>();
 
             
             Provider = serviceCollection.BuildServiceProvider();

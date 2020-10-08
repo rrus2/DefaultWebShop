@@ -52,7 +52,7 @@ namespace DefaultWebShop.Controllers
         [HttpPost]
         public async Task<IActionResult> Details(int productid, int amount)
         {
-            var user = await GetUser(HttpContext.User.Identity.AuthenticationType);
+            var user = await GetUser(HttpContext.User.Identity.Name);
             await _orderService.CreateOrder(user.Id, productid, amount);
             return View();
         }
@@ -126,9 +126,9 @@ namespace DefaultWebShop.Controllers
             var select = new SelectList(list);
             ViewBag.Amount = select;
         }
-        private async Task<ApplicationUser> GetUser(string claim)
+        private async Task<ApplicationUser> GetUser(string name)
         {
-            var user = await _userManager.FindByNameAsync(claim);
+            var user = await _userManager.FindByNameAsync(name);
             return user;
         }
     }

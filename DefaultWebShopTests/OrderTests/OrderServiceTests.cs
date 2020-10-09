@@ -15,18 +15,18 @@ namespace DefaultWebShopTests.OrderTests
 {
     public class OrderServiceTests : IClassFixture<DbFixture>, IDisposable
     {
-        private IServiceScope _scope;
-        private readonly ApplicationDbContext _context;
-        private readonly OrderService _orderService;
-        private readonly UserManager<ApplicationUser> _userManager;
+        private ApplicationDbContext _context;
+        private OrderService _orderService;
+        private UserManager<ApplicationUser> _userManager;
         private readonly ServiceProvider _provider;
-        private readonly DbFixture _fixture;
-        public OrderServiceTests(DbFixture fixture)
+        public OrderServiceTests()
         {
-            _fixture = fixture;
-            _scope = _fixture.Provider.GetService<IServiceScopeFactory>().CreateScope();
-            _provider = _fixture.Provider;
+            
+            _provider = new DbFixture().Provider;
+        }
 
+        public void Startup()
+        {
             _context = _provider.GetService<ApplicationDbContext>();
             _context.Database.EnsureCreated();
 
@@ -37,10 +37,10 @@ namespace DefaultWebShopTests.OrderTests
             SeedProducts();
             SeedUser();
         }
-
         [Fact]
         public async void CreateOrderWorks()
         {
+            Startup();
             var user = await _userManager.FindByNameAsync("pavel@hotmail.com");
             var product = _context.Products.First();
 
@@ -59,12 +59,14 @@ namespace DefaultWebShopTests.OrderTests
         [InlineData("pavel@hotmail.com", -1, -1)]
         public async void CreateOrderFails(string name, int productid, int amount)
         {
+            Startup();
             var user = await _userManager.FindByNameAsync(name);
             await Assert.ThrowsAsync<Exception>(() => _orderService.CreateOrder(user.Id, productid, amount));
         }
         [Fact]
         public async void DeleteOrderWorks()
         {
+            Startup();
             var user = await _userManager.FindByNameAsync("pavel@hotmail.com");
             var product = _context.Products.First();
 
@@ -82,12 +84,14 @@ namespace DefaultWebShopTests.OrderTests
         [InlineData(-1)]
         public async void DeleteOrderFails(int orderid)
         {
+            Startup();
             await Assert.ThrowsAsync<Exception>(() => _orderService.DeleteOrder(orderid));
         }
 
         [Fact]
         public async void GetOrdersWorks()
         {
+            Startup();
             var user = await _userManager.FindByNameAsync("pavel@hotmail.com");
             var product1 = _context.Products.First();
             var product2 = _context.Products.Last();
@@ -102,6 +106,7 @@ namespace DefaultWebShopTests.OrderTests
         [Fact]
         public async void GetOrdersByUserID()
         {
+            Startup();
             var user = await _userManager.FindByNameAsync("pavel@hotmail.com");
             var product1 = _context.Products.First();
             var product2 = _context.Products.Last();
@@ -120,6 +125,7 @@ namespace DefaultWebShopTests.OrderTests
         [InlineData(null)]
         public async void GetOrdersByUserIDFails(string id)
         {
+            Startup();
             await Assert.ThrowsAsync<Exception>(() => _orderService.GetOrdersByUser(id));
         }
         private void SeedGenres()
@@ -154,9 +160,7 @@ namespace DefaultWebShopTests.OrderTests
 
         public void Dispose()
         {
-            _context.Database.EnsureDeleted();
-            _context.Dispose();
-            _scope.Dispose();
+            _provider.Dispose();
         }
     }
 }

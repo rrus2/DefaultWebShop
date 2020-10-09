@@ -1,8 +1,10 @@
 ﻿using DefaultWebShop.Models;
 using DefaultWebShop.Services;
 using DefaultWebShop.ViewModels;
+using DefaultWebShopTests.Fixture;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure.Internal;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Moq;
 using NuGet.Frameworks;
@@ -15,19 +17,19 @@ using Xunit;
 
 namespace DefaultWebShopTests.GenreTests
 {
-    public class GenreServiceTests : IDisposable
+    public class GenreServiceTests : IDisposable, IClassFixture<DbFixture>
     {
         private readonly ApplicationDbContext _context;
         private GenreService _genreService;
+        private ServiceProvider _provider;
 
         public GenreServiceTests()
         {
-            var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-                .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
-                .Options;
+            _provider = new DbFixture().Provider;
 
-            _context = new ApplicationDbContext(options);
+            _context = _provider.GetService<ApplicationDbContext>();
             _context.Database.EnsureCreated();
+
             _genreService = new GenreService(_context);
         }
         [Fact]
@@ -195,8 +197,7 @@ namespace DefaultWebShopTests.GenreTests
         }
         public void Dispose()
         {
-            _context.Database.EnsureDeleted();
-            _context.Dispose();
+            _provider.Dispose();
         }
 
     }

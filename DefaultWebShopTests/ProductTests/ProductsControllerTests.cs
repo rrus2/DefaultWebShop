@@ -42,9 +42,9 @@ namespace DefaultWebShopTests.GenreTests
         private RoleManager<IdentityRole> _roleManager;
         private readonly ServiceProvider _provider;
 
-        public ProductsControllerTests(DbFixture fixture)
+        public ProductsControllerTests()
         {
-            _provider = fixture.Provider;
+            _provider = new DbFixture().Provider;
 
             _context = _provider.GetService<ApplicationDbContext>();
             _context.Database.EnsureCreated();
@@ -59,14 +59,10 @@ namespace DefaultWebShopTests.GenreTests
 
             _controller = new ProductsController(_productService, _genreService, _userManager, _orderService);
 
-            if (_context.Genres.Count() == 0)
-                SeedGenres();
-            if (_context.Products.Count() == 0)
-                SeedProducts();
-            if (_context.Roles.Count() == 0)
-                SeedRoles();
-            if (_context.Users.Count() == 0)
-                SeedUser();
+             SeedGenres();
+             SeedProducts();
+             SeedRoles();
+             SeedUser();
         }
         [Fact]
         public async void IndexReturnsListOfProducts()

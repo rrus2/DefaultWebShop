@@ -9,8 +9,8 @@ namespace DefaultWebShop.Services
 {
     public interface IShoppingCartService
     {
-        Task<ShoppingCart> AddToCart(int productid, ClaimsPrincipal claim, int amount);
-        Task<IEnumerable<ShoppingCart>> GetCartItems(ClaimsPrincipal claim);
+        Task<ShoppingCart> AddToCart(int productid, string name, int amount);
+        Task<IEnumerable<ShoppingCart>> GetCartItems(string name);
         Task<ShoppingCart> DeleteFromCart(int id);
     }
 }

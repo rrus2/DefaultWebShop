@@ -23,12 +23,14 @@ namespace DefaultWebShop.Services
             _context = context;
             _userManager = userManager;
         }
-        public async Task<ShoppingCart> AddToCart(int productid, ClaimsPrincipal claim, int amount)
+        public async Task<ShoppingCart> AddToCart(int productid, string name, int amount)
         {
             var product = await _productService.GetProduct(productid);
+            if (amount <= 0 || amount > product.Stock)
+                throw new Exception("Amount can not be 0 or less than");
             if (product == null)
                 throw new Exception("Error adding product tot cart");
-            var user = await _userManager.GetUserAsync(claim);
+            var user = await _userManager.FindByNameAsync(name);
             if (product == null)
                 throw new Exception("Error getting user for cart");
             var shoppingcart = new ShoppingCart { ApplicationUser = user, Product = product, Amount = amount, TotalPrice = amount * product.Price };
@@ -61,9 +63,11 @@ namespace DefaultWebShop.Services
             return cart;
         }
 
-        public async Task<IEnumerable<ShoppingCart>> GetCartItems(ClaimsPrincipal claim)
+        public async Task<IEnumerable<ShoppingCart>> GetCartItems(string name)
         {
-            var user = await _userManager.GetUserAsync(claim);
+            var user = await _userManager.FindByNameAsync(name);
+            if (user == null)
+                throw new Exception("The user has to be an existing one");
             var items = await _context.ShoppingCarts.Include(x => x.Product).Include(x => x.ApplicationUser).Where(x => x.ApplicationUser == user).ToListAsync();
             return items;
         }

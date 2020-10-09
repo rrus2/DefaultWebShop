@@ -21,11 +21,10 @@ namespace DefaultWebShopTests.OrderTests
         private readonly ServiceProvider _provider;
         public OrderServiceTests()
         {
-            
             _provider = new DbFixture().Provider;
         }
 
-        public void Startup()
+        private void Startup()
         {
             _context = _provider.GetService<ApplicationDbContext>();
             _context.Database.EnsureCreated();

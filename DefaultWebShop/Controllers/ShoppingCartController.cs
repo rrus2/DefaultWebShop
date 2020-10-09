@@ -18,8 +18,8 @@ namespace DefaultWebShop.Controllers
         [Authorize]
         public async Task<IActionResult> Index()
         {
-            var claim = HttpContext.User;
-            var items = await _shoppingCartService.GetCartItems(claim);
+            var name = HttpContext.User.Identity.Name;
+            var items = await _shoppingCartService.GetCartItems(name);
             return View(items);
         }
 
@@ -31,7 +31,7 @@ namespace DefaultWebShop.Controllers
 
         public async Task<IActionResult> AddToCart(int id, int amount)
         {
-            var model = await _shoppingCartService.AddToCart(id, User, amount);
+            var model = await _shoppingCartService.AddToCart(id, User.Identity.Name, amount);
             return View(nameof(ThankYouShoppingCart), model);
         }
 

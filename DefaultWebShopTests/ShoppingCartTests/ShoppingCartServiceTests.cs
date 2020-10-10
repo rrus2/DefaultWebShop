@@ -31,7 +31,7 @@ namespace DefaultWebShopTests.ShoppingCartTests
 
             _userManager = _provider.GetService<UserManager<ApplicationUser>>();
 
-            _shoppingCartService = new ShoppingCartService(_orderService, _productService, _context, _userManager);
+            _shoppingCartService = new ShoppingCartService(_context, _userManager);
 
             SeedUser();
             SeedGenres();
@@ -67,12 +67,11 @@ namespace DefaultWebShopTests.ShoppingCartTests
             var product = await _productService.GetProduct(1);
             var user = await _userManager.FindByNameAsync("pavel@hotmail.com");
 
-            var order = await _orderService.CreateOrder(user.Id, product.ProductID, 1);
-            var cartItem = _context.ShoppingCarts.FirstOrDefault(x => x.ProductID == product.ProductID);
+            var cartItem = await _shoppingCartService.AddToCart(product.ProductID, user.UserName, 1);
 
             await _shoppingCartService.DeleteFromCart(cartItem.ShoppingCartID);
 
-            await Assert.ThrowsAsync<Exception>(() => _shoppingCartService.GetCartItems(user.UserName));
+            await Assert.ThrowsAsync<Exception>(() => _shoppingCartService.DeleteFromCart(cartItem.ShoppingCartID));
         }
 
         [Theory]

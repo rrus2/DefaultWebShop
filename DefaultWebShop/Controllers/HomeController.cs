@@ -25,8 +25,7 @@ namespace DefaultWebShop.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var count = await _productService.GetCount();
-            var products = await _productService.GetProducts(1, count);
+            var products = await _productService.GetProducts(1, 3);
             var productsRandom = RandomizeProducts(products);
             return View(productsRandom);
         }
@@ -45,6 +44,9 @@ namespace DefaultWebShop.Controllers
 
         private List<Product> RandomizeProducts(IEnumerable<Product> products)
         {
+            if (products.Count() == 0)
+                return products.ToList();
+            
             // generate 5 random numbers
             var random = new Random();
             var listofnums = new HashSet<int>();

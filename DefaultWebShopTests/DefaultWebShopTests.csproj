@@ -20,8 +20,4 @@
     <ProjectReference Include="..\DefaultWebShop\DefaultWebShop.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="AdminTests\" />
-  </ItemGroup>
-
 </Project>

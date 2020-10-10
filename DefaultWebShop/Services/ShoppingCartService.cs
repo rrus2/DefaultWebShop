@@ -1,33 +1,33 @@
 ﻿using DefaultWebShop.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.V3.Pages.Internal.Account.Manage;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
 namespace DefaultWebShop.Services
 {
     public class ShoppingCartService : IShoppingCartService
     {
-        private readonly IOrderService _orderService;
-        private readonly IProductService _productService;
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public ShoppingCartService(IOrderService orderService, IProductService productService, ApplicationDbContext context, UserManager<ApplicationUser> userManager)
+        public ShoppingCartService(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
-            _orderService = orderService;
-            _productService = productService;
             _context = context;
             _userManager = userManager;
         }
         public async Task<ShoppingCart> AddToCart(int productid, string name, int amount)
         {
-            var product = await _productService.GetProduct(productid);
-            if (amount <= 0 || amount > product.Stock)
+            var product = _context.Products.FirstOrDefault(x => x.ProductID == productid);
+            if (amount <= 0)
                 throw new Exception("Amount can not be 0 or less than");
+            if (product.Stock < amount)
+                throw new Exception("Amount can not be greater than the stock of the product");
             if (product == null)
                 throw new Exception("Error adding product tot cart");
             var user = await _userManager.FindByNameAsync(name);
@@ -36,7 +36,14 @@ namespace DefaultWebShop.Services
             var shoppingcart = new ShoppingCart { ApplicationUser = user, Product = product, Amount = amount, TotalPrice = amount * product.Price };
             try
             {
-                _context.ShoppingCarts.Add(shoppingcart);
+                if(!_context.ShoppingCarts.Contains(shoppingcart))
+                    _context.ShoppingCarts.Add(shoppingcart);
+                else
+                {
+                    var cart = _context.ShoppingCarts.FirstOrDefault(x => x.Product.ProductID == product.ProductID);
+                    cart.Amount += amount;
+                    cart.TotalPrice = cart.Amount * cart.Product.Price;
+                }
                 await _context.SaveChangesAsync();
             }
             catch (Exception ex)

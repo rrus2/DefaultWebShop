@@ -20,6 +20,21 @@ namespace DefaultWebShop.Services
         }
         public async Task<ApplicationUser> CreateUser(UserViewModel model)
         {
+            if (model == null)
+                throw new Exception("User view model can not be null");
+            if (model.Email == null || model.Email == string.Empty)
+                throw new Exception("Model email/name can not be null or empty");
+            if (model.Role == null || model.Role == string.Empty)
+                throw new Exception("User role must be submitted");
+            if (model.Birthdate == null)
+                throw new Exception("User must have a valid birthdate");
+            if (model.Birthdate > DateTime.Now)
+                throw new Exception("User can not be from the future");
+            if (model.Password == null || model.Password == string.Empty)
+                throw new Exception("User must provide a password");
+            if (model.RepeatPassword == null || model.RepeatPassword == string.Empty)
+                throw new Exception("User must repeat the password correctly");
+
             var user = new ApplicationUser
             {
                 Email = model.Email,
@@ -37,7 +52,7 @@ namespace DefaultWebShop.Services
 
         public async Task<UserViewModel> GetUser(string userid)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == userid);
+            var user = await _userManager.FindByIdAsync(userid);
             var role = await _userManager.GetRolesAsync(user);
             if (user == null)
                 throw new Exception("User does not exist (id: " + userid + ")");
@@ -58,7 +73,15 @@ namespace DefaultWebShop.Services
 
         public async Task<ApplicationUser> UpdateUser(UserViewModel model)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == model.Id);
+            if (model == null)
+                throw new Exception("Updated model can not be null");
+            if (model.Email == null || model.Email == string.Empty)
+                throw new Exception("Updated model email can not be null or empty");
+            if (model.Password == null || model.Password == string.Empty)
+                throw new Exception("Updated model password can not be null or empty");
+            if (model.RepeatPassword == null || model.RepeatPassword == string.Empty)
+                throw new Exception("Updated model repeated password can not be null or empty");
+            var user = await _userManager.FindByIdAsync(model.Id);
             if (user == null)
                 throw new Exception("User not found");
             user.Email = model.Email;

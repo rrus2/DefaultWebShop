@@ -41,7 +41,8 @@ namespace DefaultWebShopTests.HomeTests
             var result = await _controller.Index() as ViewResult;
             var model = result.Model as List<Product>;
 
-            Assert.Contains(products.First(), model);
+            Assert.Contains(model.First(), products);
+            Assert.Contains(model.Last(), products);
         }
 
         private void SeedGenres()

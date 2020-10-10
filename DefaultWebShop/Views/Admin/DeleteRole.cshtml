@@ -1,0 +1,20 @@
+﻿@model DefaultWebShop.ViewModels.IdentityRoleViewModel;
+@{
+    ViewData["Title"] = "DeleteRole";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Delete Role</h1>
+
+<div class="jumbotron">
+    <form asp-action="DeleteRole">
+        <div class="form-group">
+            <select asp-for="@Model.Name" asp-items="@ViewBag.Roles">
+                <option value="0">Select a role to delete</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <input type="submit" value="Delete role" />
+        </div>
+    </form>
+</div>

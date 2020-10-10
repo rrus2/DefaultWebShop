@@ -84,6 +84,36 @@ namespace DefaultWebShop.Controllers
             await _adminService.UpdateUser(model);
             return View(nameof(Index));
         }
+        public async Task<IActionResult> CreateRole()
+        {
+            return View();
+        }
+        [HttpPost]
+        public async Task<IActionResult> CreateRole(IdentityRoleViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            await _adminService.CreateRole(model);
+            return View(nameof(Index));
+        }
+
+        public async Task<IActionResult> DeleteRole()
+        {
+            await LoadRoles();
+            return View();
+        }
+        [HttpPost]
+        public async Task<IActionResult> DeleteRole(IdentityRoleViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                await LoadRoles();
+                return View(model);
+            }
+            await _adminService.DeleteRole(model);
+            return View(nameof(Index));
+        }
         private async Task LoadUsers()
         {
             var users = await _adminService.GetUsers();
@@ -99,6 +129,11 @@ namespace DefaultWebShop.Controllers
         {
             var roles = await _roleManager.Roles.ToListAsync();
             ViewBag.Roles = new SelectList(roles, "Name", "Name");
+        }
+        private async Task LoadRolesForUser(string name)
+        {
+            var roles = await _adminService.GetRolesPerUser(name);
+            ViewBag.UserRoles = new SelectList(roles, "Name", "Name");
         }
     }
 }

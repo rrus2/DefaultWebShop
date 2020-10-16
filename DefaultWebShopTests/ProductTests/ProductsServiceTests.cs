@@ -214,7 +214,12 @@ namespace DefaultWebShopTests.ProductTests
 
             Assert.Equal(products.First().Name, productVM1.Name);
         }
-
+        [Theory]
+        [InlineData("prod", null, null, 0)]
+        public async void GetProductsShouldWorkWithSearchParameters(string name, int? minprice, int? maxprice, int genreid)
+        {
+            var products = await _productService.GetCountBySearch(genreid, name, minprice, maxprice);
+        }
         [Fact]
         public async void UpdateProductShouldWork()
         {

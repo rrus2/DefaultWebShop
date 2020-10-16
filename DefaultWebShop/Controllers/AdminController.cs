@@ -41,7 +41,7 @@ namespace DefaultWebShop.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateProduct(ProductViewModel model, IFormFile image)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 await LoadGenres();
                 return View(model);

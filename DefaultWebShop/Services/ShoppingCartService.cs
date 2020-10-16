@@ -26,7 +26,7 @@ namespace DefaultWebShop.Services
             var product = _context.Products.FirstOrDefault(x => x.ProductID == productid);
             if (amount <= 0)
                 throw new Exception("Amount can not be 0 or less than");
-            if (product.Stock < amount)
+            if (amount > product.Stock)
                 throw new Exception("Amount can not be greater than the stock of the product");
             if (product == null)
                 throw new Exception("Error adding product tot cart");

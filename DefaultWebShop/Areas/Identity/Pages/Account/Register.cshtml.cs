@@ -94,7 +94,7 @@ namespace DefaultWebShop.Areas.Identity.Pages.Account
                     if(!await _roleManager.RoleExistsAsync("User"))
                         await _roleManager.CreateAsync(new IdentityRole { Name = "User" });
 
-                    if (_context.Users.ToList().Count == 0)
+                    if (_context.Users.ToList().Count == 1)
                         await _userManager.AddToRoleAsync(user, "Admin");
                     else
                         await _userManager.AddToRoleAsync(user, "User");

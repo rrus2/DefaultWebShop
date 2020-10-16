@@ -94,7 +94,7 @@ namespace DefaultWebShop.Services
             return products.Count;
         }
 
-        public async Task<int> GetCountBySearch(int genreID, string name, int minvalue, int maxvalue)
+        public async Task<int> GetCountBySearch(int genreID, string name, int? minvalue, int? maxvalue)
         {
             var products = _context.Products.AsQueryable();
             if (genreID > 0)

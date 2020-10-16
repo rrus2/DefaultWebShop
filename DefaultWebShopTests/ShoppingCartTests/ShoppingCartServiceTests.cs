@@ -50,12 +50,12 @@ namespace DefaultWebShopTests.ShoppingCartTests
         }
 
         [Theory]
-        [InlineData(10)]
-        [InlineData(0)]
-        [InlineData(-1)]
-        public async void AddToCartFails(int amount)
+        [InlineData(100, 1)]
+        [InlineData(0, 2)]
+        [InlineData(-1, 3)]
+        public async void AddToCartFails(int amount, int productid)
         {
-            var product = await _productService.GetProduct(1);
+            var product = await _productService.GetProduct(productid);
             var user = await _userManager.FindByNameAsync("pavel@hotmail.com");
 
             await Assert.ThrowsAsync<Exception>(() => _orderService.CreateOrder(user.Id, product.ProductID, amount));

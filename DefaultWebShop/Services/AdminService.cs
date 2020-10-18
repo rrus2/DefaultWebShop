@@ -108,8 +108,10 @@ namespace DefaultWebShop.Services
             var role = await _userManager.GetRolesAsync(user);
             if (user == null)
                 throw new Exception("User does not exist (id: " + userid + ")");
+
             var model = new UserViewModel
             {
+                Id = user.Id,
                 Birthdate = user.Birthdate,
                 Email = user.Email,
                 Role = role.First()
@@ -141,25 +143,26 @@ namespace DefaultWebShop.Services
                 throw new Exception("Updated model can not be null");
             if (model.Email == null || model.Email == string.Empty)
                 throw new Exception("Updated model email can not be null or empty");
-            if (model.Password == null || model.Password == string.Empty)
-                throw new Exception("Updated model password can not be null or empty");
-            if (model.RepeatPassword == null || model.RepeatPassword == string.Empty)
-                throw new Exception("Updated model repeated password can not be null or empty");
-            if (model.Password != model.RepeatPassword)
-                throw new Exception("Updated model passwords must match");
 
             var user = await _userManager.FindByIdAsync(model.Id);
             if (user == null)
                 throw new Exception("User not found");
+
             user.Email = model.Email;
             user.UserName = model.Email;
             user.Birthdate = model.Birthdate;
+
             var role = await _userManager.GetRolesAsync(user);
             await _userManager.RemoveFromRoleAsync(user, role.ToString());
             await _userManager.AddToRoleAsync(user, model.Role);
-            await _userManager.RemovePasswordAsync(user);
-            await _userManager.AddPasswordAsync(user, model.Password);
+            if (model.Password != null && model.RepeatPassword != null && model.Password == model.RepeatPassword)
+            {
+                await _userManager.RemovePasswordAsync(user);
+                await _userManager.AddPasswordAsync(user, model.Password);
+            }
+
             await _context.SaveChangesAsync();
+
             return user;
         }
     }

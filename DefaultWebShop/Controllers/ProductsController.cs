@@ -97,17 +97,16 @@ namespace DefaultWebShop.Controllers
         public async Task<IActionResult> SearchProducts(string name, int? minvalue, int? maxvalue, int genreID, int? pageNumber = 1, int size = 3)
         {
             var products = await _productService.GetProductsBySearch(pageNumber, size, genreID, name, minvalue, maxvalue);
-            var searchproductsviewmodel = new ProductPageViewModel
-            {
-                Count = await _productService.GetCountBySearch(genreID, name, (int)minvalue, (int)maxvalue),
-                CurrentPage = (int)pageNumber,
-                Products = products,
-                Name = name,
-                GenreID = genreID,
-                MinValue = minvalue,
-                MaxValue = maxvalue
+            var searchproductsviewmodel = new ProductPageViewModel();
+      
+            searchproductsviewmodel.Count = await _productService.GetCountBySearch(genreID, name, minvalue, maxvalue);
+            searchproductsviewmodel.CurrentPage = (int)pageNumber;
+            searchproductsviewmodel.Products = products;
+            searchproductsviewmodel.Name = name;
+            searchproductsviewmodel.GenreID = genreID;
+            searchproductsviewmodel.MinValue = minvalue;
+            searchproductsviewmodel.MaxValue = maxvalue;
 
-            };
             return View(searchproductsviewmodel);
 
         }

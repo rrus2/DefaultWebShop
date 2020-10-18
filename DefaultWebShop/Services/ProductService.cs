@@ -214,5 +214,10 @@ namespace DefaultWebShop.Services
             }
             return product;
         }
+
+        public async Task<IEnumerable<Product>> GetProducts()
+        {
+            return await _context.Products.ToListAsync();
+        }
     }
 }

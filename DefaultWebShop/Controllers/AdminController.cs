@@ -66,6 +66,18 @@ namespace DefaultWebShop.Controllers
             return View();
         }
 
+        public async Task<IActionResult> DeleteProductAsync()
+        {
+            await LoadProducts();
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteProductAsync(int productID)
+        {
+            await _productService.DeleteProduct(productID);
+            return View(nameof(Index));
+        }
         public async Task<IActionResult> EditUserDetails(string userid)
         {
             var user = await _adminService.GetUser(userid);
@@ -134,6 +146,10 @@ namespace DefaultWebShop.Controllers
         {
             var roles = await _adminService.GetRolesPerUser(name);
             ViewBag.UserRoles = new SelectList(roles, "Name", "Name");
+        }
+        private async Task LoadProducts()
+        {
+            ViewBag.Products = new SelectList(await _productService.GetProducts(), "ProductID", "Name");
         }
     }
 }

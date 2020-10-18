@@ -1,0 +1,13 @@
+﻿@{
+    ViewData["Title"] = "DeleteProductAsync";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Delete Product</h1>
+
+<div class="jumbotron bg-dark text-center rounded">
+    <form asp-action="DeleteProductAsync" asp-controller="Admin">
+        <select asp-items="ViewBag.Products" name="productID"></select><br />
+        <input type="submit" class="btn btn-primary" value="Edit user" />
+    </form>
+</div>

@@ -155,6 +155,7 @@ namespace DefaultWebShop.Services
             var role = await _userManager.GetRolesAsync(user);
             await _userManager.RemoveFromRoleAsync(user, role.ToString());
             await _userManager.AddToRoleAsync(user, model.Role);
+
             if (model.Password != null && model.RepeatPassword != null && model.Password == model.RepeatPassword)
             {
                 await _userManager.RemovePasswordAsync(user);

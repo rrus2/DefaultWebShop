@@ -10,6 +10,7 @@ namespace DefaultWebShop.Services
 {
     public interface IProductService
     {
+        Task<IEnumerable<Product>> GetProducts();
         Task<IEnumerable<Product>> GetProducts(int? pageNumber, int size);
         Task<IEnumerable<Product>> GetProductsByGenre(int? pageNumber, int size, int genreID);
         Task<IEnumerable<Product>> GetProductsBySearch(int? pageNumber, int size, int genreID, string name, int? minvalue, int? maxvalue);

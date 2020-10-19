@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DefaultWebShop.Models;
 using DefaultWebShop.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -35,6 +36,11 @@ namespace DefaultWebShop.Controllers
             return View(nameof(ThankYouShoppingCart), model);
         }
 
+        public async Task<IActionResult> BuyAll(string userid)
+        {
+            await _shoppingCartService.BuyAll(userid);
+            return View(nameof(Index));
+        }
         public IActionResult ThankYouShoppingCart()
         {
             return View();

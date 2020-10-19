@@ -84,7 +84,6 @@ namespace DefaultWebShop.Controllers
             await LoadRoles();
             return View(user);
         }
-
         [HttpPost]
         public async Task<IActionResult> EditUserPage(UserViewModel model)
         {

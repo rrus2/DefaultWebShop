@@ -12,5 +12,6 @@ namespace DefaultWebShop.Services
         Task<ShoppingCart> AddToCart(int productid, string name, int amount);
         Task<IEnumerable<ShoppingCart>> GetCartItems(string name);
         Task<ShoppingCart> DeleteFromCart(int id);
+        Task BuyAll(string userid);
     }
 }

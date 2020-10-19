@@ -36,6 +36,7 @@ namespace DefaultWebShopTests.ShoppingCartTests
             SeedUser();
             SeedGenres();
             SeedProducts();
+            SeedCart();
         }
 
         [Fact]
@@ -106,6 +107,17 @@ namespace DefaultWebShopTests.ShoppingCartTests
         {
             await Assert.ThrowsAsync<Exception>(() => _shoppingCartService.GetCartItems("lol"));
         }
+
+        [Fact]
+        public async void BuyAllWorks()
+        {
+            var user = await _userManager.FindByNameAsync("pavel@hotmail.com");
+            await _shoppingCartService.BuyAll(user.Id);
+
+            Assert.Empty(_context.ShoppingCarts);
+            Assert.NotNull(_context.Orders);
+            Assert.Equal(_context.Orders.First().ApplicationUser, user);
+        }
         private void SeedGenres()
         {
             var genres = new List<Genre>()
@@ -141,6 +153,24 @@ namespace DefaultWebShopTests.ShoppingCartTests
             };
 
             await _userManager.CreateAsync(user, "testT_12345!");
+        }
+        private async void SeedCart()
+        {
+            var product1 = _context.Products.FirstOrDefault(x => x.Name == "Adidas");
+            var product2 = _context.Products.FirstOrDefault(x => x.Name == "Nike");
+            var product3 = _context.Products.FirstOrDefault(x => x.Name == "Puma");
+
+            var user = await _userManager.FindByNameAsync("pavel@hotmail.com");
+
+            var carts = new List<ShoppingCart>()
+            {
+                new ShoppingCart { ApplicationUser = user, Product = product1, Amount = 2 },
+                new ShoppingCart { ApplicationUser = user, Product = product2, Amount = 3 },
+                new ShoppingCart { ApplicationUser = user, Product = product3, Amount = 5 }
+            };
+
+            _context.ShoppingCarts.AddRange(carts);
+            await _context.SaveChangesAsync();
         }
         public void Dispose()
         {

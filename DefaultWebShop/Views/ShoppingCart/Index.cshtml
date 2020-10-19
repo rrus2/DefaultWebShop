@@ -41,7 +41,7 @@
                 @Html.DisplayFor(modelItem => item.Amount)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.TotalPrice)
+                <p id="totalPrice">@item.TotalPrice</p>
             </td>
             <td>
                 <a asp-controller="ShoppingCart" asp-action="DeleteFromCart" asp-route-id="@item.ShoppingCartID" class="alert-link">Delete</a>
@@ -50,3 +50,19 @@
 }
     </tbody>
 </table>
+
+<div class="jumbotron text-center">
+    <h3 id="totalOfTotal"></h3>
+    <a class="btn btn-primary" asp-controller="ShoppingCart" asp-action="BuyAll" asp-route-userid="@Model.First().ApplicationUserID">Buy all</a>
+</div>
+
+<script>
+    window.addEventListener("load", function Load() {
+        var total = document.querySelectorAll("#totalPrice");
+        var totalprice = 0;
+        for (var i = 0; i < total.length; i++) {
+            totalprice += parseInt(total[i].innerHTML);
+        }
+        document.getElementById("totalOfTotal").innerHTML = totalprice + "$";
+    });
+</script>

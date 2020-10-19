@@ -24,6 +24,8 @@ namespace DefaultWebShop.Services
         public async Task<ShoppingCart> AddToCart(int productid, string name, int amount)
         {
             var product = _context.Products.FirstOrDefault(x => x.ProductID == productid);
+            if (product == null)
+                throw new Exception("Error getting user for cart");
             if (amount <= 0)
                 throw new Exception("Amount can not be 0 or less than");
             if (amount > product.Stock)
@@ -31,8 +33,8 @@ namespace DefaultWebShop.Services
             if (product == null)
                 throw new Exception("Error adding product tot cart");
             var user = await _userManager.FindByNameAsync(name);
-            if (product == null)
-                throw new Exception("Error getting user for cart");
+            if (user == null)
+                throw new Exception("user not found");
             var shoppingcart = new ShoppingCart { ApplicationUser = user, Product = product, Amount = amount, TotalPrice = amount * product.Price };
             try
             {
@@ -51,6 +53,26 @@ namespace DefaultWebShop.Services
                 throw new Exception(ex.Message);
             }
             return shoppingcart;
+        }
+
+        public async Task BuyAll(string userid)
+        {
+            if (userid == null || userid == string.Empty)
+                throw new Exception("userid can not be null or empty");
+            
+            var carts = _context.ShoppingCarts.Where(x => x.ApplicationUserID == userid);
+            if (carts == null)
+                throw new Exception("cart not found");
+
+
+            foreach (var cart in carts)
+            {
+                var order = new Order { ApplicationUser = cart.ApplicationUser, Product = cart.Product, Amount = cart.Amount };
+                await _context.Orders.AddAsync(order);
+            }
+
+            _context.ShoppingCarts.RemoveRange(carts);
+            await _context.SaveChangesAsync();
         }
 
         public async Task<ShoppingCart> DeleteFromCart(int id)

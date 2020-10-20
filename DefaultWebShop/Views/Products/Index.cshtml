@@ -23,7 +23,7 @@
                 <div id="product" class="jumbotron bg-warning text-center">
                     <h2>@item.Name</h2>
                     <p>@item.Price $</p>
-                    <p><img src="@item.ImagePath" alt="No image" class="img rounded-circle border border-dark" height="150" width="150" /></p>
+                    <a asp-controller="Products" asp-action="Details" asp-route-id="@item.ProductID"><img src="@item.ImagePath" alt="No image" class="img rounded-circle border border-dark" height="150" width="150" /></a>
                     <a class="btn btn-primary" asp-controller="Products" asp-action="Details" asp-route-id="@item.ProductID">View product</a>
                 </div>
             </div>

@@ -78,6 +78,7 @@ namespace DefaultWebShopTests.ShoppingCartTests
             Assert.Equal(model.ApplicationUser, user);
             Assert.Equal(model.Product, product);
         }
+
         private void SeedProducts()
         {
             var products = new List<Product>()
